@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Table, Button, Modal, Form, Input, Select, message } from 'antd';
 import CryptoJS from 'crypto-js';
-import { passwordValid, emailValid } from '../utils/userInfoVaild';
-import { isAuthorize } from '../utils/authorize';
+import { passwordValid, emailValid } from '../../utils/userInfoVaild';
+import { isAuthorize } from '../../utils/authorize';
 
 export function UserControl() {
   const [users, setUsers] = useState(JSON.parse(localStorage.getItem("user")) || []);

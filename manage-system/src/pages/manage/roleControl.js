@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Modal, Form, Input, Tree } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import { isAuthorize } from '../utils/authorize';
+import { isAuthorize } from '../../utils/authorize';
 
 export function RoleControl() {
   const [roles, setRoles] = useState(JSON.parse(localStorage.getItem("privileges")) || []);
@@ -16,7 +16,7 @@ export function RoleControl() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if(!isAuthorize("角色管理")){
+    if (!isAuthorize("角色管理")) {
       navigate('/dashboard');
     }
     const storedMenus = JSON.parse(localStorage.getItem("menus")) || [];

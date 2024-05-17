@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { RightCircleTwoTone } from '@ant-design/icons';
 import { Breadcrumb, Layout, Menu, theme, Button } from 'antd';
 import { Outlet, useNavigate, useLocation, Link } from 'react-router-dom';
-import { isLogin } from '../utils/authorize';
+import { isLogin } from '../../utils/authorize';
 const { Content, Sider } = Layout;
 
 
@@ -14,7 +14,7 @@ export function Dashboard() {
   // 侧边栏的菜单项
   useEffect(() => {
     if (!isLogin()) {
-      navigate('/login');
+      navigate('/manage/login');
     }
   }, [navigate]);
 
@@ -31,7 +31,7 @@ export function Dashboard() {
             children: children.length > 0 ? children : null,
             onClick: () => {
               if (menu.parent !== "") {
-                navigate("/dashboard" + menu.path);
+                navigate("/manage/dashboard" + menu.path);
               }
             },
           };

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Modal, Form, Input, message, Select } from 'antd';
-import { isAuthorize } from '../utils/authorize';
+import { isAuthorize } from '../../utils/authorize';
 import {
   useNavigate
 
@@ -14,7 +14,7 @@ export function MenuControl() {
   const navigate = useNavigate();
   useEffect(() => {
     if (!isAuthorize("菜单管理")) {
-      navigate('/dashboard');
+      navigate('/manage/dashboard');
     }
     if (!localStorage.getItem('menus')) {
       localStorage.setItem('menus', JSON.stringify([]));

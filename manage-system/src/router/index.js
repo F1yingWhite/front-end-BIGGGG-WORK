@@ -1,45 +1,70 @@
-import { Login } from "../pages/Login";
-import { createBrowserRouter, Navigate } from "react-router-dom";
-import { Dashboard } from "../pages/Dashboard";
-import { UserControl } from "../pages/userControl";
-import { RoleControl } from "../pages/roleControl";
-import { MenuControl } from "../pages/menuControl";
+import { Login } from "../pages/manage/Login";
+import { createBrowserRouter, Navigate, Outlet } from "react-router-dom";
+import { Dashboard } from "../pages/manage/Dashboard";
+import { UserControl } from "../pages/manage/userControl";
+import { RoleControl } from "../pages/manage/roleControl";
+import { MenuControl } from "../pages/manage/menuControl";
+import { OrderControl } from "../pages/manage/orderControl";
+import { ProductControl } from "../pages/manage/productControl";
+import { ClassificationControl } from "../pages/manage/classificationControl";
 
-// TODO:可能需要动态生成。。？
 const router = createBrowserRouter([
   {
-    path: "/login",
-    element: <Login />
-  },
-  {
-    path: "/dashboard",
-    element: <Dashboard />,
+    path: "/manage",
+    element: <Outlet />,
     children: [
       {
-        path: "userControl",
-        element: (
-          <UserControl />
-        )
+        path: "login",
+        element: <Login />
       },
       {
-        path: "roleControl",
-        element: (
-          <RoleControl />
-        )
+        path: "dashboard",
+        element: <Dashboard />,
+        children: [
+          {
+            path: "userControl",
+            element: <UserControl />
+          },
+          {
+            path: "roleControl",
+            element: <RoleControl />
+          },
+          {
+            path: "menuControl",
+            element: <MenuControl />
+          },
+          {
+            path: "orderControl",
+            element: <OrderControl />
+          },
+          {
+            path: "productsControl",
+            element: <ProductControl />
+          },
+          {
+            path: "classControl",
+            element: <ClassificationControl />
+          },
+          {
+            path: "*",
+            element: <Navigate to="userControl" replace />
+          }
+        ]
       },
       {
-        path: "menuControl",
-        element: (
-          <MenuControl />
-        )
+        path: "",
+        element: <Navigate to="login" replace />
+      },
+      {
+        path: "*",
+        element: <Navigate to="login" replace />
       }
     ]
   },
   {
-    path: "/",
-    element: <Navigate to="/login" replace /> // 重定向到 /login
+    path: "user",
+    element: <>hello</>
   }
 ]);
-
 
 export default router;

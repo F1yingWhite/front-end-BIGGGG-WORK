@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Form, Input, Button, Tabs, Typography, message, } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import CryptoJS from 'crypto-js';
-import { passwordValid, emailValid } from '../utils/userInfoVaild';
+import { passwordValid, emailValid } from '../../utils/userInfoVaild';
 
 export function Login() {
   const [activeKey, setActiveKey] = useState('1');
@@ -67,6 +67,35 @@ export function Login() {
           allowUser: [
             '管理员'
           ]
+        }, 
+        {
+          title: "商城管理",
+          parent: "",
+          path: ""
+        }, 
+        {
+          title: "订单列表",
+          parent: "商城管理",
+          path: "/orderControl",
+          allowUser: [
+            '管理员'
+          ]
+        },
+        {
+          title: "商品列表",
+          parent: "商城管理",
+          path: "/productsControl",
+          allowUser: [
+            '管理员'
+          ]
+        },
+        {
+          title: "分类列表",
+          parent: "商城管理",
+          path: "/classControl",
+          allowUser: [
+            '管理员'
+          ]
         }
       ];
       localStorage.setItem('menus', JSON.stringify(menus));
@@ -90,7 +119,7 @@ export function Login() {
     localStorage.setItem('isLogin', 'true'); // 设置登录状态
     localStorage.setItem('username', user.username); // 设置用户名
     localStorage.setItem('privilege', user.privilege); // 设置权限
-    navigate('/dashboard'); // 跳转到首页
+    navigate('/manage/dashboard'); // 跳转到首页
   };
 
   const Register = (values) => {
