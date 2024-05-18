@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Input, Button, Modal, Form, Upload, Image } from 'antd';
+import { Table, Input, Button, Modal, Form, Upload, Image, message } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { v4 as uuidv4 } from 'uuid';
 
 const { Search } = Input;
 
-const getBase64 = file =>
-  new Promise((resolve, reject) => {
+const getBase64 = (file) => {
+  return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
+    reader.onloadend = () => resolve(reader.result);
     reader.onerror = error => reject(error);
   });
+};
 
 export function ProductControl() {
   const [products, setProducts] = useState([]);
@@ -22,16 +23,22 @@ export function ProductControl() {
   const [mainImageFileList, setMainImageFileList] = useState([]);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState('');
+  const [searchValue, setSearchValue] = useState('');
   const [form] = Form.useForm();
+
+  const privilege = localStorage.getItem("privilege");
+  const username = localStorage.getItem("username");
 
   useEffect(() => {
     const storedProducts = JSON.parse(localStorage.getItem('products')) || [];
-    setProducts(storedProducts);
-    setFilteredProducts(storedProducts);
-  }, []);
+    const filtered = privilege === '管理员' ? storedProducts : storedProducts.filter(product => product.seller === username);
+    setProducts(filtered);
+    setFilteredProducts(filtered);
+  }, [privilege, username]);
 
   const handleSearch = e => {
     const value = e.target.value.toLowerCase();
+    setSearchValue(value);
     const filtered = products.filter(product => product.name.toLowerCase().includes(value));
     setFilteredProducts(filtered);
   };
@@ -73,22 +80,24 @@ export function ProductControl() {
       );
       const mainImage = mainImageFileList[0]?.url || await getBase64(mainImageFileList[0].originFileObj);
 
+      let updatedProducts;
       if (editingProduct) {
-        const updatedProducts = products.map(product =>
+        updatedProducts = products.map(product =>
           product.id === editingProduct.id ? { ...product, ...values, image: mainImage, imageList } : product
         );
-        setProducts(updatedProducts);
-        localStorage.setItem('products', JSON.stringify(updatedProducts));
       } else {
-        const newProduct = { ...values, id: uuidv4(), image: mainImage, imageList };
-        const updatedProducts = [...products, newProduct];
-        setProducts(updatedProducts);
-        localStorage.setItem('products', JSON.stringify(updatedProducts));
+        const newProduct = { ...values, id: uuidv4(), image: mainImage, imageList, seller: privilege === '管理员' ? values.seller : username };
+        updatedProducts = [...products, newProduct];
       }
+
+      setProducts(updatedProducts);
+      setFilteredProducts(updatedProducts);
+      setSearchValue('');
+      localStorage.setItem('products', JSON.stringify(updatedProducts));
       setAddProductVisible(false);
       form.resetFields();
     } catch (error) {
-      console.error("Error during form validation or image processing:", error);
+      message.error('请填写完整信息', 3);
     }
   };
 
@@ -97,19 +106,16 @@ export function ProductControl() {
     form.resetFields();
   };
 
-  const handleMainImageChange = async ({ fileList: newFileList }) => {
-    setMainImageFileList(newFileList.slice(-1)); // Only keep the latest file
+  const handleMainImageChange = ({ fileList: newFileList }) => {
+    setMainImageFileList(newFileList.slice(-1));
   };
 
-  const handleImageListChange = async ({ fileList: newFileList }) => {
+  const handleImageListChange = ({ fileList: newFileList }) => {
     setFileList(newFileList);
   };
 
   const handlePreview = async file => {
-    if (!file.url && !file.preview) {
-      file.preview = await getBase64(file.originFileObj);
-    }
-    setPreviewImage(file.url || file.preview);
+    setPreviewImage(file.url || file.thumbUrl);
     setPreviewOpen(true);
   };
 
@@ -128,33 +134,34 @@ export function ProductControl() {
     { title: '销量', dataIndex: 'sales', key: 'sales' },
     { title: '图片', dataIndex: 'imageList', key: 'imageList', render: images => images.map((img, idx) => <img key={idx} src={img} alt={`product-${idx}`} style={{ width: 50, margin: '0 5px', minWidth: 20, minHeight: 20 }} />) },
     { title: '商品编号', dataIndex: 'id', key: 'id' },
-    { title: '所属店家', dataIndex: 'seller', key: 'seller' },
+    { title: '所属店家', dataIndex: 'seller', key: 'seller', render: text => privilege === '管理员' ? text : null },
     { title: '操作', key: 'action', render: (_, record) => <Button onClick={() => editProduct(record)}>修改</Button> }
-  ];
+  ].filter(column => !(column.dataIndex === 'seller' && privilege !== '管理员'));
 
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
         <Search
           placeholder="根据商品名称搜索"
+          value={searchValue}
           onChange={handleSearch}
           style={{ width: '25%' }}
         />
-        <Button type="primary" onClick={addProduct}>添加商品</Button>
+        <Button type="primary" onClick={addProduct}>Add Product</Button>
       </div>
       <Table dataSource={filteredProducts} columns={columns} rowKey="id" pagination={{ pageSize: 7 }} />
-      <Modal title={editingProduct ? '编辑商品' : '添加商品'} open={addProductVisible} onOk={handleOk} onCancel={handleCancel}>
+      <Modal title={editingProduct ? 'Edit Product' : 'Add Product'} open={addProductVisible} onOk={handleOk} onCancel={handleCancel}>
         <Form form={form} layout="vertical" name="productForm">
           <Form.Item name="name" label="商品名称" rules={[{ required: true, message: '请输入商品名称!' }]}>
             <Input />
           </Form.Item>
           <Form.Item name="image" label="商品图片" rules={[{ required: true, message: '请上传商品图片!' }]}>
             <Upload
+              action="/assets"
               listType="picture-card"
               fileList={mainImageFileList}
               onPreview={handlePreview}
               onChange={handleMainImageChange}
-              beforeUpload={() => false}
             >
               {mainImageFileList.length >= 1 ? null : uploadButton}
             </Upload>
@@ -170,18 +177,20 @@ export function ProductControl() {
           </Form.Item>
           <Form.Item name="imageList" label="图片列表">
             <Upload
+              action="/assets"
               listType="picture-card"
               fileList={fileList}
               onPreview={handlePreview}
               onChange={handleImageListChange}
-              beforeUpload={() => false}
             >
               {fileList.length >= 8 ? null : uploadButton}
             </Upload>
           </Form.Item>
-          <Form.Item name="seller" label="所属店家" rules={[{ required: true, message: '请输入所属店家!' }]}>
-            <Input />
-          </Form.Item>
+          {privilege === '管理员' && (
+            <Form.Item name="seller" label="所属店家" rules={[{ required: true, message: '请输入所属店家!' }]}>
+              <Input />
+            </Form.Item>
+          )}
         </Form>
       </Modal>
       {previewImage && (
@@ -197,4 +206,4 @@ export function ProductControl() {
       )}
     </div>
   );
-};
+}
