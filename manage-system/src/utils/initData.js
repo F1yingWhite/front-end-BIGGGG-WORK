@@ -136,6 +136,25 @@ async function initData() {
     products.push(product);
     localStorage.setItem('products', JSON.stringify(products));
   }
+
+  //订单的格式：用户姓名，商品id，订单商品，订单地址，订单时间，订单数量，订单金额，订单状态（付款-发货-收获）
+  let orders = JSON.parse(localStorage.getItem('orders')) || [];
+  if (orders.length === 0) {
+    orders = [
+      {
+        userId: "user",
+        sellerId: "seller",
+        productId: products[0].id,
+        productName: products[0].name,
+        address: "北京市海淀区",
+        time: new Date().toLocaleString(),
+        amount: 1,
+        price: 8848,
+        status: "付款"
+      }
+    ];
+    localStorage.setItem('orders', JSON.stringify(orders));
+  }
 }
 
 export { initData };

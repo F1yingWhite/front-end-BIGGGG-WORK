@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Table, Input, Button, Modal, Form, Upload, Image, Select, message } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { v4 as uuidv4 } from 'uuid';
+import { isAuthorize } from '../../utils/authorize';
+import { useNavigate } from 'react-router-dom';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -30,17 +32,21 @@ export function ProductControl() {
 
   const privilege = localStorage.getItem("privilege");
   const username = localStorage.getItem("username");
-
+  const navigate = useNavigate();
   useEffect(() => {
+    if (!isAuthorize("商品列表")) {
+      navigate('/manage/dashboard');
+    }
     const storedProducts = JSON.parse(localStorage.getItem('products')) || [];
-    const filtered = privilege === '管理员' ? storedProducts : storedProducts.filter(product => product.seller === username);
+    console.log(username)
+    const filtered = privilege === '管理员' ? storedProducts : storedProducts.filter(product => product.sellerId === username);
     setProducts(filtered);
     setFilteredProducts(filtered);
 
     const users = JSON.parse(localStorage.getItem('user')) || [];
     const sellerUsers = users.filter(user => user.privilege === '商家').map(user => user.username);
     setSellers(sellerUsers);
-  }, [privilege, username]);
+  }, [privilege, username,navigate]);
 
   const handleSearch = e => {
     const value = e.target.value.toLowerCase();
