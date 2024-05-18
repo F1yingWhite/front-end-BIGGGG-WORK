@@ -38,8 +38,7 @@ export function ProductControl() {
       navigate('/manage/dashboard');
     }
     const storedProducts = JSON.parse(localStorage.getItem('products')) || [];
-    console.log(username)
-    const filtered = privilege === '管理员' ? storedProducts : storedProducts.filter(product => product.sellerId === username);
+    const filtered = privilege === '管理员' ? storedProducts : storedProducts.filter(product => product.seller === username);
     setProducts(filtered);
     setFilteredProducts(filtered);
 
