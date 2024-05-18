@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Input, Button, Modal, Form, Upload, Image, message } from 'antd';
+import { Table, Input, Button, Modal, Form, Upload, Image, Select, message } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { v4 as uuidv4 } from 'uuid';
 
 const { Search } = Input;
+const { Option } = Select;
 
 const getBase64 = (file) => {
   return new Promise((resolve, reject) => {
@@ -24,6 +25,7 @@ export function ProductControl() {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState('');
   const [searchValue, setSearchValue] = useState('');
+  const [sellers, setSellers] = useState([]);
   const [form] = Form.useForm();
 
   const privilege = localStorage.getItem("privilege");
@@ -34,6 +36,10 @@ export function ProductControl() {
     const filtered = privilege === '管理员' ? storedProducts : storedProducts.filter(product => product.seller === username);
     setProducts(filtered);
     setFilteredProducts(filtered);
+
+    const users = JSON.parse(localStorage.getItem('user')) || [];
+    const sellerUsers = users.filter(user => user.privilege === '商家').map(user => user.username);
+    setSellers(sellerUsers);
   }, [privilege, username]);
 
   const handleSearch = e => {
@@ -188,7 +194,11 @@ export function ProductControl() {
           </Form.Item>
           {privilege === '管理员' && (
             <Form.Item name="seller" label="所属店家" rules={[{ required: true, message: '请输入所属店家!' }]}>
-              <Input />
+              <Select>
+                {sellers.map(seller => (
+                  <Option key={seller} value={seller}>{seller}</Option>
+                ))}
+              </Select>
             </Form.Item>
           )}
         </Form>
