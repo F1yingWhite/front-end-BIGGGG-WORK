@@ -131,7 +131,7 @@ export function MenuControl() {
         />
         <Button type="primary" onClick={addMenu}>Add Menu</Button>
       </div>
-      <Table dataSource={filteredMenus} columns={columns} rowKey="title" />
+      <Table dataSource={filteredMenus} columns={columns} rowKey="title" pagination={{ pageSize: 7 }} />
       <Modal title={editingMenu ? 'Edit Menu' : 'Add Menu'} open={addMenuVisible} onOk={handleOk} onCancel={handleCancel}>
         <Form form={form} layout="vertical" name="menuForm">
           <Form.Item name="title" label="Title" rules={[{ required: true, message: '请输入标题!' }]}>

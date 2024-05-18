@@ -159,7 +159,7 @@ export function RoleControl() {
         />
         <Button type="primary" onClick={addRole}>Add Role</Button>
       </div>
-      <Table dataSource={filteredRoles} columns={columns} rowKey="role" />
+      <Table dataSource={filteredRoles} columns={columns} rowKey="role" pagination={{ pageSize: 7 }} />
       {/* 用户管理 */}
       <Modal title={editingRole ? 'Edit Role' : 'Add Role'} open={addRoleVisible} onOk={handleOk} onCancel={handleCancel}>
         <Form form={form} layout="vertical" name="roleForm">

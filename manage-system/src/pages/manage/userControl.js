@@ -113,7 +113,7 @@ export function UserControl() {
         />
         <Button type="primary" onClick={addUser}>Add User</Button>
       </div>
-      <Table dataSource={filteredUsers} columns={columns} rowKey="username" />
+      <Table dataSource={filteredUsers} columns={columns} rowKey="username" pagination={{ pageSize: 7 }} />
       <Modal title={editingUser ? 'Edit User' : 'Add User'} open={addUserVisible} onOk={handleOk} onCancel={handleCancel}>
         <Form form={form} layout="vertical" name="userForm">
           <Form.Item name="username" label="Username" >
