@@ -1,7 +1,8 @@
 import CryptoJS from "crypto-js";
 import { v4 as uuidv4 } from 'uuid';
+import { getFileBase64 } from "./img2base64";
 
-function initData() {
+async function initData() {
   let users = JSON.parse(localStorage.getItem("user")) || [];
   if (users.length === 0) {
     localStorage.setItem("user", JSON.stringify([
@@ -25,7 +26,8 @@ function initData() {
       }
     ]));
   }
-  //设置权限列表
+
+  // 设置权限列表
   let privileges = JSON.parse(localStorage.getItem('privileges')) || [];
   if (privileges.length === 0) {
     privileges = [
@@ -44,7 +46,8 @@ function initData() {
     ];
     localStorage.setItem('privileges', JSON.stringify(privileges));
   }
-  //设置菜单列表
+
+  // 设置菜单列表
   let menus = JSON.parse(localStorage.getItem('menus')) || [];
   if (menus.length === 0) {
     menus = [
@@ -112,25 +115,25 @@ function initData() {
     ];
     localStorage.setItem('menus', JSON.stringify(menus));
   }
+
   // 商品名称 商品图片 商品价格 库存 销量 图片 商品编号 所属店家
   let products = JSON.parse(localStorage.getItem('products')) || [];
   if (products.length === 0) {
-    products = [
-      {
-        name: "huawei mate 60 pro",
-        image: "/assets/mate60.png",
-        price: 8848,
-        stock: 1024,
-        sales: 233,
-        imageList: [
-          "/assets/mate60_3.png",
-          "/assets/mate60_2.png",
-          "/assets/mate60_1.png"
-        ],
-        id: uuidv4(),
-        seller: "seller"
-      },
-    ]
+    const product = {
+      name: "huawei mate 60 pro",
+      image: await getFileBase64(`${process.env.PUBLIC_URL}/assets/mate60.png`),
+      price: 8848,
+      stock: 1024,
+      sales: 233,
+      imageList: await Promise.all([
+        getFileBase64(`${process.env.PUBLIC_URL}/assets/mate60_3.png`),
+        getFileBase64(`${process.env.PUBLIC_URL}/assets/mate60_2.png`),
+        getFileBase64(`${process.env.PUBLIC_URL}/assets/mate60_1.png`),
+      ]),
+      id: uuidv4(),
+      seller: "seller"
+    };
+    products.push(product);
     localStorage.setItem('products', JSON.stringify(products));
   }
 }

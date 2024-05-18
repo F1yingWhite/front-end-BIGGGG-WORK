@@ -5,6 +5,14 @@ import { v4 as uuidv4 } from 'uuid';
 
 const { Search } = Input;
 
+const getBase64 = file =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+  });
+
 export function ProductControl() {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -42,14 +50,14 @@ export function ProductControl() {
         uid: idx,
         name: `image-${idx}.png`,
         status: 'done',
-        url: process.env.PUBLIC_URL + img,
+        url: img,
       }))
     );
     setMainImageFileList([{
       uid: '-1',
       name: 'main-image.png',
       status: 'done',
-      url: process.env.PUBLIC_URL + product.image
+      url: product.image
     }]);
     form.setFieldsValue({
       ...product,
@@ -57,10 +65,13 @@ export function ProductControl() {
     setAddProductVisible(true);
   };
 
-  const handleOk = () => {
-    form.validateFields().then(values => {
-      const imageList = fileList.map(file => file.response?.url || file.url);
-      const mainImage = mainImageFileList[0]?.response?.url || mainImageFileList[0]?.url;
+  const handleOk = async () => {
+    try {
+      const values = await form.validateFields();
+      const imageList = await Promise.all(
+        fileList.map(async (file) => file.url || await getBase64(file.originFileObj))
+      );
+      const mainImage = mainImageFileList[0]?.url || await getBase64(mainImageFileList[0].originFileObj);
 
       if (editingProduct) {
         const updatedProducts = products.map(product =>
@@ -76,7 +87,9 @@ export function ProductControl() {
       }
       setAddProductVisible(false);
       form.resetFields();
-    });
+    } catch (error) {
+      console.error("Error during form validation or image processing:", error);
+    }
   };
 
   const handleCancel = () => {
@@ -84,16 +97,19 @@ export function ProductControl() {
     form.resetFields();
   };
 
-  const handleMainImageChange = ({ fileList: newFileList }) => {
+  const handleMainImageChange = async ({ fileList: newFileList }) => {
     setMainImageFileList(newFileList.slice(-1)); // Only keep the latest file
   };
 
-  const handleImageListChange = ({ fileList: newFileList }) => {
+  const handleImageListChange = async ({ fileList: newFileList }) => {
     setFileList(newFileList);
   };
 
   const handlePreview = async file => {
-    setPreviewImage(file.url || file.thumbUrl);
+    if (!file.url && !file.preview) {
+      file.preview = await getBase64(file.originFileObj);
+    }
+    setPreviewImage(file.url || file.preview);
     setPreviewOpen(true);
   };
 
@@ -106,11 +122,11 @@ export function ProductControl() {
 
   const columns = [
     { title: '商品名称', dataIndex: 'name', key: 'name' },
-    { title: '商品图片', dataIndex: 'image', key: 'image', render: text => <img src={process.env.PUBLIC_URL + text} alt="product" style={{ width: 50, minWidth: 20, minHeight: 20 }} /> },
+    { title: '商品图片', dataIndex: 'image', key: 'image', render: text => <img src={text} alt="product" style={{ width: 50, minWidth: 20, minHeight: 20 }} /> },
     { title: '商品价格', dataIndex: 'price', key: 'price' },
     { title: '库存', dataIndex: 'stock', key: 'stock' },
     { title: '销量', dataIndex: 'sales', key: 'sales' },
-    { title: '图片', dataIndex: 'imageList', key: 'imageList', render: images => images.map((img, idx) => <img key={idx} src={process.env.PUBLIC_URL + img} alt={`product-${idx}`} style={{ width: 50, margin: '0 5px', minWidth: 20, minHeight: 20 }} />) },
+    { title: '图片', dataIndex: 'imageList', key: 'imageList', render: images => images.map((img, idx) => <img key={idx} src={img} alt={`product-${idx}`} style={{ width: 50, margin: '0 5px', minWidth: 20, minHeight: 20 }} />) },
     { title: '商品编号', dataIndex: 'id', key: 'id' },
     { title: '所属店家', dataIndex: 'seller', key: 'seller' },
     { title: '操作', key: 'action', render: (_, record) => <Button onClick={() => editProduct(record)}>修改</Button> }
@@ -124,21 +140,21 @@ export function ProductControl() {
           onChange={handleSearch}
           style={{ width: '25%' }}
         />
-        <Button type="primary" onClick={addProduct}>Add Product</Button>
+        <Button type="primary" onClick={addProduct}>添加商品</Button>
       </div>
       <Table dataSource={filteredProducts} columns={columns} rowKey="id" pagination={{ pageSize: 7 }} />
-      <Modal title={editingProduct ? 'Edit Product' : 'Add Product'} open={addProductVisible} onOk={handleOk} onCancel={handleCancel}>
+      <Modal title={editingProduct ? '编辑商品' : '添加商品'} open={addProductVisible} onOk={handleOk} onCancel={handleCancel}>
         <Form form={form} layout="vertical" name="productForm">
           <Form.Item name="name" label="商品名称" rules={[{ required: true, message: '请输入商品名称!' }]}>
             <Input />
           </Form.Item>
           <Form.Item name="image" label="商品图片" rules={[{ required: true, message: '请上传商品图片!' }]}>
             <Upload
-              action="/assets" // 替换为实际的上传地址
               listType="picture-card"
               fileList={mainImageFileList}
               onPreview={handlePreview}
               onChange={handleMainImageChange}
+              beforeUpload={() => false}
             >
               {mainImageFileList.length >= 1 ? null : uploadButton}
             </Upload>
@@ -154,11 +170,11 @@ export function ProductControl() {
           </Form.Item>
           <Form.Item name="imageList" label="图片列表">
             <Upload
-              action="/assets" // 替换为实际的上传地址
               listType="picture-card"
               fileList={fileList}
               onPreview={handlePreview}
               onChange={handleImageListChange}
+              beforeUpload={() => false}
             >
               {fileList.length >= 8 ? null : uploadButton}
             </Upload>
@@ -182,4 +198,3 @@ export function ProductControl() {
     </div>
   );
 };
-
