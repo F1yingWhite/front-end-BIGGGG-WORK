@@ -1,38 +1,52 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { RightCircleTwoTone } from '@ant-design/icons';
-import { Breadcrumb, Layout, Menu, theme, Button } from 'antd';
+import { Breadcrumb, Layout, Menu, Button, theme } from 'antd';
 import { Outlet, useNavigate, useLocation, Link } from 'react-router-dom';
 import { isLogin } from '../../utils/authorize';
+import axios from 'axios';
+
 const { Content, Sider } = Layout;
 
-
 export function Dashboard() {
+  const [menuItems, setMenuItems] = useState([]);
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
   const navigate = useNavigate();
+
   useEffect(() => {
     if (!isLogin()) {
       navigate('/manage/login');
+    } else {
+      fetchMenus();
     }
   }, [navigate]);
 
-  const renderMenuItems = (menuData, userPrivilege) => {
-    const menus = JSON.parse(menuData);
-    console.log(userPrivilege)
-    console.log(menuData)
+  const fetchMenus = async () => {
+    try {
+      const response = await axios.get('/api/roles/menus');
+      const userPrivilege = localStorage.getItem('privilege');
+      const filteredMenus = response.data.filter(menu => !menu.allowUser || menu.allowUser.includes(userPrivilege));
+      localStorage.setItem('menus', JSON.stringify(filteredMenus));
+      setMenuItems(renderMenuItems(filteredMenus, userPrivilege));
+    } catch (error) {
+      console.error('获取菜单失败', error);
+    }
+  };
+
+  const renderMenuItems = (menus, userPrivilege) => {
     const buildMenuItems = (menus, parent = "") => {
       const result = [];
       for (const menu of menus) {
         if (menu.parent === parent && (!menu.allowUser || menu.allowUser.includes(userPrivilege))) {
           const children = buildMenuItems(menus, menu.title);
           const menuItem = {
-            key: menu.title,
+            key: menu.path || menu.title,
             label: menu.title,
             children: children.length > 0 ? children : null,
             onClick: () => {
-              if (menu.parent !== "") {
-                navigate("/manage/dashboard" + menu.path);
+              if (menu.path) {
+                navigate(`/manage/dashboard${menu.path}`);
               }
             },
           };
@@ -41,12 +55,8 @@ export function Dashboard() {
       }
       return result;
     };
-    let items = buildMenuItems(menus);
-
-    return items;
+    return buildMenuItems(menus);
   };
-
-  const items = renderMenuItems(localStorage.getItem("menus"), localStorage.getItem("privilege"));
 
   const pathItems = useLocation().pathname.split('/').filter(item => item);
   const pathLength = pathItems.length;
@@ -58,21 +68,20 @@ export function Dashboard() {
       <Link to={`/${pathItems.slice(0, index + 1).join('/')}`}>{item}</Link>
     )
   }));
+
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Layout>
-        <Sider
-          width="20%"
-        >
+        <Sider width="20%">
           <Menu
             mode="inline"
-            defaultSelectedKeys={['1']}
+            defaultSelectedKeys={['/manage/dashboard']}
             defaultOpenKeys={['权限管理']}
             style={{
               height: '100%',
               borderRight: 0,
             }}
-            items={items}
+            items={menuItems}
           />
         </Sider>
         <Layout
@@ -111,6 +120,4 @@ export function Dashboard() {
       </Layout>
     </Layout>
   );
-};
-
-
+}

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Modal, Form, Input, Tree } from 'antd';
+import { Table, Button, Modal, Form, Input, Tree, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { isAuthorize } from '../../utils/authorize';
 
 export function RoleControl() {
-  const [roles, setRoles] = useState(JSON.parse(localStorage.getItem("privileges")) || []);
-  const [filteredRoles, setFilteredRoles] = useState(roles);
+  const [roles, setRoles] = useState([]);
+  const [filteredRoles, setFilteredRoles] = useState([]);
   const [menus, setMenus] = useState([]);
   const [addRoleVisible, setAddRoleVisible] = useState(false);
   const [editingRole, setEditingRole] = useState(null);
@@ -17,11 +18,30 @@ export function RoleControl() {
 
   useEffect(() => {
     if (!isAuthorize("角色管理")) {
-      navigate('/dashboard');
+      navigate('/manage/dashboard');
     }
-    const storedMenus = JSON.parse(localStorage.getItem("menus")) || [];
-    setMenus(transformToTreeData(storedMenus));
+    fetchRoles();
+    fetchMenus();
   }, [navigate]);
+
+  const fetchRoles = async () => {
+    try {
+      const response = await axios.get('/api/roles');
+      setRoles(response.data);
+      setFilteredRoles(response.data);
+    } catch (error) {
+      message.error('获取角色数据失败');
+    }
+  };
+
+  const fetchMenus = async () => {
+    try {
+      const response = await axios.get('/api/roles/menus');
+      setMenus(transformToTreeData(response.data));
+    } catch (error) {
+      message.error('获取菜单数据失败');
+    }
+  };
 
   const columns = [
     {
@@ -85,27 +105,36 @@ export function RoleControl() {
     form.setFieldsValue(role);
   };
 
-  const deleteRole = (roleName) => {
-    const updatedRoles = roles.filter(role => role.role !== roleName);
-    setRoles(updatedRoles);
-    setFilteredRoles(updatedRoles);
-    localStorage.setItem("privileges", JSON.stringify(updatedRoles));
+  const deleteRole = async (roleName) => {
+    try {
+      await axios.delete(`/api/roles/${roleName}`);
+      const updatedRoles = roles.filter(role => role.role !== roleName);
+      setRoles(updatedRoles);
+      setFilteredRoles(updatedRoles);
+      message.success('角色删除成功');
+    } catch (error) {
+      message.error('删除角色失败');
+    }
   };
 
-  const handleOk = () => {
-    form.validateFields().then(values => {
+  const handleOk = async () => {
+    try {
+      const values = await form.validateFields();
       let updatedRoles;
       if (editingRole) {
+        await axios.put(`/api/roles/${editingRole.role}`, values);
         updatedRoles = roles.map(role => role.role === editingRole.role ? values : role);
       } else {
+        await axios.post('/api/roles', values);
         updatedRoles = [...roles, values];
       }
       setRoles(updatedRoles);
       setFilteredRoles(updatedRoles);
-      localStorage.setItem("privileges", JSON.stringify(updatedRoles));
       setAddRoleVisible(false);
-    }).catch(info => {
-    });
+      message.success(editingRole ? '角色更新成功' : '角色添加成功');
+    } catch (error) {
+      message.error(editingRole ? '更新角色失败' : '添加角色失败');
+    }
   };
 
   const handleCancel = () => {
@@ -128,17 +157,23 @@ export function RoleControl() {
     setPrivilegeVisible(true);
   };
 
-  const handlePrivilegeOk = () => {
-    const storedMenus = JSON.parse(localStorage.getItem("menus"));
-    const updatedMenus = storedMenus.map(menu => {
-      if (selectedKeys.includes(menu.path || menu.title)) {
-        return { ...menu, allowUser: [...new Set([...(menu.allowUser || []), editingRole.role])] };
-      } else {
-        return { ...menu, allowUser: (menu.allowUser || []).filter(user => user !== editingRole.role) };
-      }
-    });
-    localStorage.setItem("menus", JSON.stringify(updatedMenus));
-    setPrivilegeVisible(false);
+  const handlePrivilegeOk = async () => {
+    try {
+      const storedMenus = JSON.parse(localStorage.getItem("menus"));
+      const updatedMenus = storedMenus.map(menu => {
+        if (selectedKeys.includes(menu.path || menu.title)) {
+          return { ...menu, allowUser: [...new Set([...(menu.allowUser || []), editingRole.role])] };
+        } else {
+          return { ...menu, allowUser: (menu.allowUser || []).filter(user => user !== editingRole.role) };
+        }
+      });
+      await axios.put('/api/roles/menus', updatedMenus);
+      localStorage.setItem("menus", JSON.stringify(updatedMenus));
+      setPrivilegeVisible(false);
+      message.success('权限更新成功');
+    } catch (error) {
+      message.error('更新权限失败');
+    }
   };
 
   const handlePrivilegeCancel = () => {

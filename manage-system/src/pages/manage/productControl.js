@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Input, Button, Modal, Form, Upload, Image, Select, message } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
-import { v4 as uuidv4 } from 'uuid';
+import axios from 'axios';
 import { isAuthorize } from '../../utils/authorize';
 import { useNavigate } from 'react-router-dom';
 
@@ -33,19 +33,35 @@ export function ProductControl() {
   const privilege = localStorage.getItem("privilege");
   const username = localStorage.getItem("username");
   const navigate = useNavigate();
+
   useEffect(() => {
     if (!isAuthorize("商品列表")) {
       navigate('/manage/dashboard');
     }
-    const storedProducts = JSON.parse(localStorage.getItem('products')) || [];
-    const filtered = privilege === '管理员' ? storedProducts : storedProducts.filter(product => product.seller === username);
-    setProducts(filtered);
-    setFilteredProducts(filtered);
+    fetchProducts();
+    fetchSellers();
+  }, [navigate]);
 
-    const users = JSON.parse(localStorage.getItem('user')) || [];
-    const sellerUsers = users.filter(user => user.privilege === '商家').map(user => user.username);
-    setSellers(sellerUsers);
-  }, [privilege, username, navigate]);
+  const fetchProducts = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/products');
+      const productsData = response.data;
+      const filtered = privilege === '管理员' ? productsData : productsData.filter(product => product.seller === username);
+      setProducts(filtered);
+      setFilteredProducts(filtered);
+    } catch (error) {
+      message.error('获取商品数据失败');
+    }
+  };
+
+  const fetchSellers = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/users/sellers');
+      setSellers(response.data);
+    } catch (error) {
+      message.error('获取商家数据失败');
+    }
+  };
 
   const handleSearch = e => {
     const value = e.target.value.toLowerCase();
@@ -68,19 +84,23 @@ export function ProductControl() {
         uid: idx,
         name: `image-${idx}.png`,
         status: 'done',
-        url: img,
+        url: `http://localhost:5000${img}`, // 修正URL路径
       }))
     );
     setMainImageFileList([{
       uid: '-1',
       name: 'main-image.png',
       status: 'done',
-      url: product.image
+      url: `http://localhost:5000${product.image}` // 修正URL路径
     }]);
     form.setFieldsValue({
       ...product,
     });
     setAddProductVisible(true);
+  };
+
+  const generateId = () => {
+    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   };
 
   const handleOk = async () => {
@@ -93,22 +113,24 @@ export function ProductControl() {
 
       let updatedProducts;
       if (editingProduct) {
+        await axios.put(`http://localhost:5000/api/products/${editingProduct.id}`, { ...values, image: mainImage, imageList });
         updatedProducts = products.map(product =>
           product.id === editingProduct.id ? { ...product, ...values, image: mainImage, imageList } : product
         );
       } else {
-        const newProduct = { ...values, id: uuidv4(), image: mainImage, imageList, seller: privilege === '管理员' ? values.seller : username };
+        const newProduct = { ...values, id: generateId(), image: mainImage, imageList, seller: privilege === '管理员' ? values.seller : username };
+        await axios.post('http://localhost:5000/api/products', newProduct);
         updatedProducts = [...products, newProduct];
       }
 
       setProducts(updatedProducts);
       setFilteredProducts(updatedProducts);
       setSearchValue('');
-      localStorage.setItem('products', JSON.stringify(updatedProducts));
       setAddProductVisible(false);
       form.resetFields();
+      message.success(editingProduct ? '修改商品成功' : '添加商品成功');
     } catch (error) {
-      message.error('请填写完整信息', 3);
+      message.error('操作商品失败');
     }
   };
 
@@ -139,12 +161,12 @@ export function ProductControl() {
 
   const columns = [
     { title: '商品名称', dataIndex: 'name', key: 'name' },
-    { title: '商品图片', dataIndex: 'image', key: 'image', render: text => <img src={text} alt="product" style={{ width: 50, minWidth: 20, minHeight: 20 }} /> },
+    { title: '商品图片', dataIndex: 'image', key: 'image', render: text => <img src={`http://localhost:5000${text}`} alt="product" style={{ width: 50, minWidth: 20, minHeight: 20 }} /> },
     { title: '商品价格', dataIndex: 'price', key: 'price' },
     { title: '库存', dataIndex: 'stock', key: 'stock' },
     { title: '销量', dataIndex: 'sales', key: 'sales' },
     { title: '分类', dataIndex: 'classification', key: 'classification' },
-    { title: '图片', dataIndex: 'imageList', key: 'imageList', render: images => images.map((img, idx) => <img key={idx} src={img} alt={`product-${idx}`} style={{ width: 50, margin: '0 5px', minWidth: 20, minHeight: 20 }} />) },
+    { title: '图片', dataIndex: 'imageList', key: 'imageList', render: images => images.map((img, idx) => <img key={idx} src={`http://localhost:5000${img}`} alt={`product-${idx}`} style={{ width: 50, margin: '0 5px', minWidth: 20, minHeight: 20 }} />) },
     { title: '商品编号', dataIndex: 'id', key: 'id' },
     { title: '所属店家', dataIndex: 'seller', key: 'seller', render: text => privilege === '管理员' ? text : null },
     { title: '操作', key: 'action', render: (_, record) => <Button onClick={() => editProduct(record)}>修改</Button> }
@@ -159,17 +181,17 @@ export function ProductControl() {
           onChange={handleSearch}
           style={{ width: '25%' }}
         />
-        <Button type="primary" onClick={addProduct}>Add Product</Button>
+        <Button type="primary" onClick={addProduct}>添加商品</Button>
       </div>
       <Table dataSource={filteredProducts} columns={columns} rowKey="id" pagination={{ pageSize: 7 }} />
-      <Modal title={editingProduct ? 'Edit Product' : 'Add Product'} open={addProductVisible} onOk={handleOk} onCancel={handleCancel}>
+      <Modal title={editingProduct ? '编辑商品' : '添加商品'} open={addProductVisible} onOk={handleOk} onCancel={handleCancel}>
         <Form form={form} layout="vertical" name="productForm">
           <Form.Item name="name" label="商品名称" rules={[{ required: true, message: '请输入商品名称!' }]}>
             <Input />
           </Form.Item>
           <Form.Item name="classification" label="分类" rules={[{ required: true, message: '请输入商品分类!' }]}>
             <Select>
-              {JSON.parse(localStorage.getItem('classifications')).map((classification) => (
+              {filteredProducts.map((classification) => (
                 <Option key={classification.id} value={classification.name}>
                   {classification.name}
                 </Option>
@@ -178,7 +200,7 @@ export function ProductControl() {
           </Form.Item>
           <Form.Item name="image" label="商品图片" rules={[{ required: true, message: '请上传商品图片!' }]}>
             <Upload
-              action="/assets"
+              action="http://localhost:5000/api/upload" // 指定上传路径
               listType="picture-card"
               fileList={mainImageFileList}
               onPreview={handlePreview}
@@ -198,7 +220,7 @@ export function ProductControl() {
           </Form.Item>
           <Form.Item name="imageList" label="图片列表">
             <Upload
-              action="/assets"
+              action="http://localhost:5000/api/upload" // 指定上传路径
               listType="picture-card"
               fileList={fileList}
               onPreview={handlePreview}
