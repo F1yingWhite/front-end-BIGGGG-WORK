@@ -90,6 +90,9 @@ export function MenuControl() {
 
   const handleOk = () => {
     form.validateFields().then(values => {
+      if (!values.parent) {
+        values.parent = '';
+      }
       let updatedMenus;
       if (editingMenu) {
         updatedMenus = menus.map(menu => menu.title === editingMenu.title ? values : menu);

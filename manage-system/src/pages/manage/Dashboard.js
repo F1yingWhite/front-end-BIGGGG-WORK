@@ -11,7 +11,6 @@ export function Dashboard() {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
   const navigate = useNavigate();
-  // 侧边栏的菜单项
   useEffect(() => {
     if (!isLogin()) {
       navigate('/manage/login');
@@ -20,6 +19,8 @@ export function Dashboard() {
 
   const renderMenuItems = (menuData, userPrivilege) => {
     const menus = JSON.parse(menuData);
+    console.log(userPrivilege)
+    console.log(menuData)
     const buildMenuItems = (menus, parent = "") => {
       const result = [];
       for (const menu of menus) {
@@ -41,12 +42,11 @@ export function Dashboard() {
       return result;
     };
     let items = buildMenuItems(menus);
+
     return items;
   };
 
-
   const items = renderMenuItems(localStorage.getItem("menus"), localStorage.getItem("privilege"));
-
 
   const pathItems = useLocation().pathname.split('/').filter(item => item);
   const pathLength = pathItems.length;
