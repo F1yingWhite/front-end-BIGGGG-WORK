@@ -121,6 +121,7 @@ async function initData() {
   if (products.length === 0) {
     const product = {
       name: "huawei mate 60 pro",
+      classification: "手机数码",
       image: await getFileBase64(`${process.env.PUBLIC_URL}/assets/mate60.png`),
       price: 8848,
       stock: 1024,
@@ -153,6 +154,27 @@ async function initData() {
       }
     ];
     localStorage.setItem('orders', JSON.stringify(orders));
+  }
+  let classificiations = JSON.parse(localStorage.getItem('classifications')) || [];
+  if (classificiations.length === 0) {
+    classificiations = [
+      {
+        name: "手机数码",
+      },
+      {
+        name: "家用电器",
+      },
+      {
+        name: "家居家装",
+      },
+      {
+        name: "汽车用品",
+      },
+      {
+        name: "电脑办公",
+      }
+    ];
+    localStorage.setItem('classifications', JSON.stringify(classificiations));
   }
 }
 

@@ -98,10 +98,9 @@ export function UserControl() {
   const navigate = useNavigate();
   useEffect(() => {
     if (!isAuthorize('用户管理')) {
-      navigate('/dashboard');
+      navigate('/manage/dashboard');
     }
   }, [navigate]);
-
 
   return (
     <div>

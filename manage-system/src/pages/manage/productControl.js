@@ -45,7 +45,7 @@ export function ProductControl() {
     const users = JSON.parse(localStorage.getItem('user')) || [];
     const sellerUsers = users.filter(user => user.privilege === '商家').map(user => user.username);
     setSellers(sellerUsers);
-  }, [privilege, username,navigate]);
+  }, [privilege, username, navigate]);
 
   const handleSearch = e => {
     const value = e.target.value.toLowerCase();
@@ -143,6 +143,7 @@ export function ProductControl() {
     { title: '商品价格', dataIndex: 'price', key: 'price' },
     { title: '库存', dataIndex: 'stock', key: 'stock' },
     { title: '销量', dataIndex: 'sales', key: 'sales' },
+    { title: '分类', dataIndex: 'classification', key: 'classification' },
     { title: '图片', dataIndex: 'imageList', key: 'imageList', render: images => images.map((img, idx) => <img key={idx} src={img} alt={`product-${idx}`} style={{ width: 50, margin: '0 5px', minWidth: 20, minHeight: 20 }} />) },
     { title: '商品编号', dataIndex: 'id', key: 'id' },
     { title: '所属店家', dataIndex: 'seller', key: 'seller', render: text => privilege === '管理员' ? text : null },
@@ -165,6 +166,15 @@ export function ProductControl() {
         <Form form={form} layout="vertical" name="productForm">
           <Form.Item name="name" label="商品名称" rules={[{ required: true, message: '请输入商品名称!' }]}>
             <Input />
+          </Form.Item>
+          <Form.Item name="classification" label="分类" rules={[{ required: true, message: '请输入商品分类!' }]}>
+            <Select>
+              {JSON.parse(localStorage.getItem('classifications')).map((classification) => (
+                <Option key={classification.id} value={classification.name}>
+                  {classification.name}
+                </Option>
+              ))}
+            </Select>
           </Form.Item>
           <Form.Item name="image" label="商品图片" rules={[{ required: true, message: '请上传商品图片!' }]}>
             <Upload
