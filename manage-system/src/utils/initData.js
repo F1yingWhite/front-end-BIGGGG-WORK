@@ -1,5 +1,4 @@
 import CryptoJS from "crypto-js";
-import { v4 as uuidv4 } from 'uuid';
 import { getFileBase64 } from "./img2base64";
 
 async function initData() {
@@ -118,6 +117,7 @@ async function initData() {
 
   // 商品名称 商品图片 商品价格 库存 销量 图片 商品编号 所属店家
   let products = JSON.parse(localStorage.getItem('products')) || [];
+
   if (products.length === 0) {
     const product = {
       name: "huawei mate 60 pro",
@@ -130,13 +130,12 @@ async function initData() {
         getFileBase64(`${process.env.PUBLIC_URL}/assets/mate60_2.png`),
         getFileBase64(`${process.env.PUBLIC_URL}/assets/mate60_1.png`),
       ]),
-      id: uuidv4(),
+      id: "d40a13a6-6b58-4f08-b9e6-da2cbd20c3fc",
       seller: "seller"
     };
     products.push(product);
     localStorage.setItem('products', JSON.stringify(products));
   }
-
   //订单的格式：用户姓名，商品id，订单商品，订单地址，订单时间，订单数量，订单金额，订单状态（付款-发货-收获）
   let orders = JSON.parse(localStorage.getItem('orders')) || [];
   if (orders.length === 0) {

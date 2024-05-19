@@ -3,14 +3,12 @@ import { Form, Input, Button, Tabs, message,Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import CryptoJS from 'crypto-js';
 import { passwordValid, emailValid } from '../../utils/userInfoVaild';
-import { initData } from '../../utils/initData';
 
 export function Login() {
   const [activeKey, setActiveKey] = useState('1');
   const navigate = useNavigate();
 
   useEffect(() => {
-    initData();
   }, []);
 
   const login = (values) => {
