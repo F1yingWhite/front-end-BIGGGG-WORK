@@ -92,6 +92,9 @@ export function OrderControl() {
   const handleOk = () => {
     form.validateFields().then(values => {
       let updatedOrders;
+      if (values.sellerId === undefined) {
+        values.sellerId = currentUser;
+      }
       updatedOrders = orders.map(order => order.id === editingOrder.id ? values : order);
       setOrders(updatedOrders);
       setFilteredOrders(userPrivilege === '管理员' ? updatedOrders : updatedOrders.filter(order => order.sellerId === currentUser));
