@@ -20,7 +20,7 @@ export function OrderControl() {
 
   const fetchOrders = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/orders');
+      const response = await axios.get('http://localhost:6000/api/orders');
       const ordersData = response.data;
       const filtered = userPrivilege === '管理员' ? ordersData : ordersData.filter(order => order.sellerId === currentUser);
       setOrders(filtered);
@@ -43,12 +43,12 @@ export function OrderControl() {
       let updatedOrders;
 
       if (editingOrder) {
-        await axios.put(`http://localhost:5000/api/orders/${editingOrder.productId}`, values);
+        await axios.put(`http://localhost:6000/api/orders/${editingOrder.productId}`, values);
         updatedOrders = orders.map(order => order.productId === editingOrder.productId ? { ...order, ...values } : order);
         message.success('修改订单成功');
       } else {
         const newOrder = { ...values, id: Date.now().toString() };
-        await axios.post('http://localhost:5000/api/orders', newOrder);
+        await axios.post('http://localhost:6000/api/orders', newOrder);
         updatedOrders = [...orders, newOrder];
         message.success('添加订单成功');
       }

@@ -15,15 +15,6 @@ export function RoleControl() {
   const [form] = Form.useForm();
 
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!isAuthorize("角色管理")) {
-      navigate('/manage/dashboard');
-    }
-    fetchRoles();
-    fetchMenus();
-  }, [navigate]);
-
   const fetchRoles = async () => {
     try {
       const response = await axios.get('/api/roles');
@@ -42,6 +33,15 @@ export function RoleControl() {
       message.error('获取菜单数据失败');
     }
   };
+  useEffect(() => {
+    if (!isAuthorize("角色管理")) {
+      navigate('/manage/dashboard');
+    }
+    fetchRoles();
+    fetchMenus();
+  }, [navigate]);
+
+
 
   const columns = [
     {

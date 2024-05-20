@@ -17,7 +17,7 @@ export function MenuControl() {
 
   const fetchMenus = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/menus');
+      const response = await axios.get('http://localhost:6000/api/menus');
       setMenus(response.data);
       setFilteredMenus(response.data);
     } catch (error) {
@@ -85,7 +85,7 @@ export function MenuControl() {
           return;
         }
       }
-      await axios.delete(`http://localhost:5000/api/menus/${title}`);
+      await axios.delete(`http://localhost:6000/api/menus/${title}`);
       const updatedMenus = menus.filter(menu => menu.title !== title);
       setMenus(updatedMenus);
       setFilteredMenus(updatedMenus);
@@ -103,10 +103,10 @@ export function MenuControl() {
       }
       let updatedMenus;
       if (editingMenu) {
-        await axios.put(`http://localhost:5000/api/menus/${editingMenu.title}`, values);
+        await axios.put(`http://localhost:6000/api/menus/${editingMenu.title}`, values);
         updatedMenus = menus.map(menu => menu.title === editingMenu.title ? values : menu);
       } else {
-        await axios.post('http://localhost:5000/api/menus', values);
+        await axios.post('http://localhost:6000/api/menus', values);
         updatedMenus = [...menus, values];
       }
       setMenus(updatedMenus);

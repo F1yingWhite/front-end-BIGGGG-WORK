@@ -17,7 +17,7 @@ export function ClassificationControl() {
 
   const fetchClassifications = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/classifications');
+      const response = await axios.get('http://localhost:6000/api/classifications');
       setClassifications(response.data);
       setFilteredClassifications(response.data);
     } catch (error) {
@@ -46,7 +46,7 @@ export function ClassificationControl() {
 
   const deleteClassification = async (name) => {
     try {
-      await axios.delete(`http://localhost:5000/api/classifications/${name}`);
+      await axios.delete(`http://localhost:6000/api/classifications/${name}`);
       const updatedClassifications = classifications.filter(classification => classification.name !== name);
       setClassifications(updatedClassifications);
       setFilteredClassifications(updatedClassifications);
@@ -62,10 +62,10 @@ export function ClassificationControl() {
       const values = await form.validateFields();
       let updatedClassifications;
       if (editingClassification) {
-        await axios.put(`http://localhost:5000/api/classifications/${editingClassification.name}`, values);
+        await axios.put(`http://localhost:6000/api/classifications/${editingClassification.name}`, values);
         updatedClassifications = classifications.map(classification => classification.name === editingClassification.name ? values : classification);
       } else {
-        await axios.post('http://localhost:5000/api/classifications', values);
+        await axios.post('http://localhost:6000/api/classifications', values);
         updatedClassifications = [...classifications, values];
       }
       setClassifications(updatedClassifications);

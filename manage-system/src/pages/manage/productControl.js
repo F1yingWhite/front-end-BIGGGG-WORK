@@ -48,7 +48,7 @@ export function ProductControl() {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/products');
+      const response = await axios.get('http://localhost:6000/api/products');
       const productsData = response.data;
       const filtered = privilege === '管理员' ? productsData : productsData.filter(product => product.seller === username);
       setProducts(filtered);
@@ -60,7 +60,7 @@ export function ProductControl() {
 
   const fetchSellers = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/users/sellers');
+      const response = await axios.get('http://localhost:6000/api/users/sellers');
       setSellers(response.data);
     } catch (error) {
       message.error('获取商家数据失败');
@@ -113,13 +113,13 @@ export function ProductControl() {
 
       let updatedProducts;
       if (editingProduct) {
-        await axios.put(`http://localhost:5000/api/products/${editingProduct.id}`, { ...values, image: mainImage, imageList });
+        await axios.put(`http://localhost:6000/api/products/${editingProduct.id}`, { ...values, image: mainImage, imageList });
         updatedProducts = products.map(product =>
           product.id === editingProduct.id ? { ...product, ...values, image: mainImage, imageList } : product
         );
       } else {
         const newProduct = { ...values, id: generateUniqueId(), image: mainImage, imageList, seller: privilege === '管理员' ? values.seller : username };
-        await axios.post('http://localhost:5000/api/products', newProduct);
+        await axios.post('http://localhost:6000/api/products', newProduct);
         updatedProducts = [...products, newProduct];
       }
 
@@ -200,7 +200,7 @@ export function ProductControl() {
           </Form.Item>
           <Form.Item name="image" label="商品图片" rules={[{ required: true, message: '请上传商品图片!' }]}>
             <Upload
-              action="http://localhost:5000/api/upload" // 指定上传路径
+              action="http://localhost:6000/api/upload" // 指定上传路径
               listType="picture-card"
               fileList={mainImageFileList}
               onPreview={handlePreview}
@@ -220,7 +220,7 @@ export function ProductControl() {
           </Form.Item>
           <Form.Item name="imageList" label="图片列表">
             <Upload
-              action="http://localhost:5000/api/upload" // 指定上传路径
+              action="http://localhost:6000/api/upload" // 指定上传路径
               listType="picture-card"
               fileList={fileList}
               onPreview={handlePreview}
