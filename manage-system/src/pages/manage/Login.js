@@ -35,7 +35,7 @@ export function Login() {
       message.success('注册成功', 3);
       setActiveKey('1');
     } catch (error) {
-      message.error('注册失败', 3);
+      message.error(error.response.data, 3);
     }
   };
 
