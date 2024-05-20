@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Table, Button, Modal, Form, Input, Select, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { isAuthorize } from '../../utils/authorize';
 
 export function OrderControl() {
   const [orders, setOrders] = useState([]);
@@ -16,21 +15,18 @@ export function OrderControl() {
   const userPrivilege = localStorage.getItem('privilege');
 
   useEffect(() => {
-    if (!isAuthorize('订单列表')) {
-      navigate('/manage/dashboard');
-      return;
-    }
     fetchOrders();
   }, [navigate]);
 
   const fetchOrders = async () => {
     try {
-      const response = await axios.get('/api/orders');
+      const response = await axios.get('http://localhost:5000/api/orders');
       const ordersData = response.data;
       const filtered = userPrivilege === '管理员' ? ordersData : ordersData.filter(order => order.sellerId === currentUser);
-      setOrders(ordersData);
+      setOrders(filtered);
       setFilteredOrders(filtered);
     } catch (error) {
+      console.error('获取订单数据失败:', error);
       message.error('获取订单数据失败');
     }
   };
@@ -44,16 +40,25 @@ export function OrderControl() {
   const handleOk = async () => {
     try {
       const values = await form.validateFields();
+      let updatedOrders;
+
       if (editingOrder) {
-        await axios.put(`/api/orders/${editingOrder.id}`, values);
-        const updatedOrders = orders.map(order => order.id === editingOrder.id ? { ...order, ...values } : order);
-        setOrders(updatedOrders);
-        setFilteredOrders(userPrivilege === '管理员' ? updatedOrders : updatedOrders.filter(order => order.sellerId === currentUser));
+        await axios.put(`http://localhost:5000/api/orders/${editingOrder.productId}`, values);
+        updatedOrders = orders.map(order => order.productId === editingOrder.productId ? { ...order, ...values } : order);
         message.success('修改订单成功');
+      } else {
+        const newOrder = { ...values, id: Date.now().toString() };
+        await axios.post('http://localhost:5000/api/orders', newOrder);
+        updatedOrders = [...orders, newOrder];
+        message.success('添加订单成功');
       }
+
+      setOrders(updatedOrders);
+      setFilteredOrders(userPrivilege === '管理员' ? updatedOrders : updatedOrders.filter(order => order.sellerId === currentUser));
       setAddOrderVisible(false);
     } catch (error) {
-      message.error('修改订单失败');
+      console.error('操作订单失败:', error);
+      message.error('操作订单失败');
     }
   };
 
@@ -96,7 +101,7 @@ export function OrderControl() {
           style={{ width: '25%' }}
         />
       </div>
-      <Table dataSource={filteredOrders} columns={columns} rowKey="id" pagination={{ pageSize: 7 }} />
+      <Table dataSource={filteredOrders} columns={columns} rowKey="productId" pagination={{ pageSize: 7 }} />
       <Modal title="修改订单" open={addOrderVisible} onOk={handleOk} onCancel={handleCancel}>
         <Form form={form} layout="vertical" name="orderForm">
           <Form.Item name="userId" label="User ID" rules={[{ required: true, message: '请输入用户ID' }]}>

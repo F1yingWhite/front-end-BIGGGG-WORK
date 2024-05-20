@@ -17,6 +17,10 @@ const getBase64 = (file) => {
   });
 };
 
+const generateUniqueId = () => {
+  return `${new Date().getTime()}-${Math.random().toString(36).substr(2, 9)}`;
+};
+
 export function ProductControl() {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -84,23 +88,19 @@ export function ProductControl() {
         uid: idx,
         name: `image-${idx}.png`,
         status: 'done',
-        url: `http://localhost:5000${img}`, // 修正URL路径
+        url: img // 使用返回的URL
       }))
     );
     setMainImageFileList([{
       uid: '-1',
       name: 'main-image.png',
       status: 'done',
-      url: `http://localhost:5000${product.image}` // 修正URL路径
+      url: product.image // 使用返回的URL
     }]);
     form.setFieldsValue({
       ...product,
     });
     setAddProductVisible(true);
-  };
-
-  const generateId = () => {
-    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   };
 
   const handleOk = async () => {
@@ -118,7 +118,7 @@ export function ProductControl() {
           product.id === editingProduct.id ? { ...product, ...values, image: mainImage, imageList } : product
         );
       } else {
-        const newProduct = { ...values, id: generateId(), image: mainImage, imageList, seller: privilege === '管理员' ? values.seller : username };
+        const newProduct = { ...values, id: generateUniqueId(), image: mainImage, imageList, seller: privilege === '管理员' ? values.seller : username };
         await axios.post('http://localhost:5000/api/products', newProduct);
         updatedProducts = [...products, newProduct];
       }
@@ -161,12 +161,12 @@ export function ProductControl() {
 
   const columns = [
     { title: '商品名称', dataIndex: 'name', key: 'name' },
-    { title: '商品图片', dataIndex: 'image', key: 'image', render: text => <img src={`http://localhost:5000${text}`} alt="product" style={{ width: 50, minWidth: 20, minHeight: 20 }} /> },
+    { title: '商品图片', dataIndex: 'image', key: 'image', render: text => <img src={text} alt="product" style={{ width: 50, minWidth: 20, minHeight: 20 }} /> },
     { title: '商品价格', dataIndex: 'price', key: 'price' },
     { title: '库存', dataIndex: 'stock', key: 'stock' },
     { title: '销量', dataIndex: 'sales', key: 'sales' },
     { title: '分类', dataIndex: 'classification', key: 'classification' },
-    { title: '图片', dataIndex: 'imageList', key: 'imageList', render: images => images.map((img, idx) => <img key={idx} src={`http://localhost:5000${img}`} alt={`product-${idx}`} style={{ width: 50, margin: '0 5px', minWidth: 20, minHeight: 20 }} />) },
+    { title: '图片', dataIndex: 'imageList', key: 'imageList', render: images => images.map((img, idx) => <img key={idx} src={img} alt={`product-${idx}`} style={{ width: 50, margin: '0 5px', minWidth: 20, minHeight: 20 }} />) },
     { title: '商品编号', dataIndex: 'id', key: 'id' },
     { title: '所属店家', dataIndex: 'seller', key: 'seller', render: text => privilege === '管理员' ? text : null },
     { title: '操作', key: 'action', render: (_, record) => <Button onClick={() => editProduct(record)}>修改</Button> }

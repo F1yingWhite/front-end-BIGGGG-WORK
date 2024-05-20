@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Table, Input, Button, Modal, Form, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { isAuthorize } from '../../utils/authorize';
 
 export function ClassificationControl() {
   const [classifications, setClassifications] = useState([]);
@@ -13,20 +12,17 @@ export function ClassificationControl() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isAuthorize('分类列表')) {
-      navigate('/manage/dashboard');
-    } else {
-      fetchClassifications();
-    }
+    fetchClassifications();
   }, [navigate]);
 
   const fetchClassifications = async () => {
     try {
-      const response = await axios.get('/api/classifications');
+      const response = await axios.get('http://localhost:5000/api/classifications');
       setClassifications(response.data);
       setFilteredClassifications(response.data);
     } catch (error) {
       message.error('获取分类数据失败');
+      console.error('获取分类数据失败:', error);
     }
   };
 
@@ -50,13 +46,14 @@ export function ClassificationControl() {
 
   const deleteClassification = async (name) => {
     try {
-      await axios.delete(`/api/classifications/${name}`);
+      await axios.delete(`http://localhost:5000/api/classifications/${name}`);
       const updatedClassifications = classifications.filter(classification => classification.name !== name);
       setClassifications(updatedClassifications);
       setFilteredClassifications(updatedClassifications);
       message.success('删除分类成功');
     } catch (error) {
       message.error('删除分类失败');
+      console.error('删除分类失败:', error);
     }
   };
 
@@ -65,10 +62,10 @@ export function ClassificationControl() {
       const values = await form.validateFields();
       let updatedClassifications;
       if (editingClassification) {
-        await axios.put(`/api/classifications/${editingClassification.name}`, values);
+        await axios.put(`http://localhost:5000/api/classifications/${editingClassification.name}`, values);
         updatedClassifications = classifications.map(classification => classification.name === editingClassification.name ? values : classification);
       } else {
-        await axios.post('/api/classifications', values);
+        await axios.post('http://localhost:5000/api/classifications', values);
         updatedClassifications = [...classifications, values];
       }
       setClassifications(updatedClassifications);
@@ -77,6 +74,7 @@ export function ClassificationControl() {
       message.success(editingClassification ? '修改分类成功' : '添加分类成功');
     } catch (error) {
       message.error('操作分类失败');
+      console.error('操作分类失败:', error);
     }
   };
 
