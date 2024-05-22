@@ -38,7 +38,7 @@ export function Dashboard() {
     const buildMenuItems = (menus, parent = "") => {
       const result = [];
       for (const menu of menus) {
-        if (menu.parent === parent && (!menu.allowUser || menu.allowUser.includes(userPrivilege))) {
+        if (menu.parent === parent && (menu.parent === "" || menu.allowUser.includes(userPrivilege))) {
           const children = buildMenuItems(menus, menu.title);
           const menuItem = {
             key: menu.path || menu.title,

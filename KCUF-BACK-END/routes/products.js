@@ -20,8 +20,8 @@ const upload = multer({ storage: storage });
 router.get('/', (req, res) => {
     const updatedProducts = products.map(product => ({
         ...product,
-        image: `http://localhost:6000${product.image}`,
-        imageList: product.imageList.map(img => `http://localhost:6000${img}`)
+        image: `http://localhost:6001${product.image}`,
+        imageList: product.imageList.map(img => `http://localhost:6001${img}`)
     }));
     res.send(updatedProducts);
 });
