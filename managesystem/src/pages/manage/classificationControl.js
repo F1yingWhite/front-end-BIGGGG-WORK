@@ -1,30 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Input, Button, Modal, Form, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { isAuthorize } from '../../utils/authorize';
 
 export function ClassificationControl() {
-  const [classifications, setClassifications] = useState([]);
-  const [filteredClassifications, setFilteredClassifications] = useState([]);
+  const [classifications, setClassifications] = useState(JSON.parse(localStorage.getItem("classifications")) || []);
+  const [filteredClassifications, setFilteredClassifications] = useState(classifications);
   const [addClassificationVisible, setAddClassificationVisible] = useState(false);
   const [editingClassification, setEditingClassification] = useState(null);
   const [form] = Form.useForm();
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchClassifications();
-  }, [navigate]);
-
-  const fetchClassifications = async () => {
-    try {
-      const response = await axios.get('http://localhost:6001/api/classifications');
-      setClassifications(response.data);
-      setFilteredClassifications(response.data);
-    } catch (error) {
-      message.error('获取分类数据失败');
-      console.error('获取分类数据失败:', error);
+    if (!isAuthorize('分类列表')) {
+      navigate('/manage/dashboard');
     }
-  };
+  }, [navigate]);
 
   const handleSearch = (e) => {
     const value = e.target.value.toLowerCase();
@@ -44,38 +35,57 @@ export function ClassificationControl() {
     form.setFieldsValue(classification);
   };
 
-  const deleteClassification = async (name) => {
-    try {
-      await axios.delete(`http://localhost:6001/api/classifications/${name}`);
-      const updatedClassifications = classifications.filter(classification => classification.name !== name);
-      setClassifications(updatedClassifications);
-      setFilteredClassifications(updatedClassifications);
-      message.success('删除分类成功');
-    } catch (error) {
-      message.error('删除分类失败');
-      console.error('删除分类失败:', error);
-    }
+  const deleteClassification = (name) => {
+    const updatedClassifications = classifications.filter(classification => classification.name !== name);
+    setClassifications(updatedClassifications);
+    setFilteredClassifications(updatedClassifications);
+    localStorage.setItem("classifications", JSON.stringify(updatedClassifications));
+
+    // Update products to remove deleted classification
+    const products = JSON.parse(localStorage.getItem('products')) || [];
+    const updatedProducts = products.map(product => ({
+      ...product,
+      classification: product.classification === name ? '' : product.classification
+    }));
+    localStorage.setItem('products', JSON.stringify(updatedProducts));
   };
 
-  const handleOk = async () => {
-    try {
-      const values = await form.validateFields();
+  const handleOk = () => {
+    form.validateFields().then(values => {
+      const duplicate = classifications.some(classification => classification.name === values.name);
+      if (duplicate && (!editingClassification || editingClassification.name !== values.name)) {
+        message.error('分类名称不能重复', 3);
+        return;
+      }
+
       let updatedClassifications;
+      let oldName = '';
+
       if (editingClassification) {
-        await axios.put(`http://localhost:6001/api/classifications/${editingClassification.name}`, values);
-        updatedClassifications = classifications.map(classification => classification.name === editingClassification.name ? values : classification);
+        oldName = editingClassification.name;
+        updatedClassifications = classifications.map(classification => classification.name === oldName ? values : classification);
       } else {
-        await axios.post('http://localhost:6001/api/classifications', values);
         updatedClassifications = [...classifications, values];
       }
+
       setClassifications(updatedClassifications);
       setFilteredClassifications(updatedClassifications);
+      localStorage.setItem("classifications", JSON.stringify(updatedClassifications));
+
+      // Update products with new classification name
+      if (oldName) {
+        const products = JSON.parse(localStorage.getItem('products')) || [];
+        const updatedProducts = products.map(product => ({
+          ...product,
+          classification: product.classification === oldName ? values.name : product.classification
+        }));
+        localStorage.setItem('products', JSON.stringify(updatedProducts));
+      }
+
       setAddClassificationVisible(false);
-      message.success(editingClassification ? '修改分类成功' : '添加分类成功');
-    } catch (error) {
-      message.error('操作分类失败');
-      console.error('操作分类失败:', error);
-    }
+    }).catch(info => {
+      message.error('请填写完整信息', 3);
+    });
   };
 
   const handleCancel = () => {

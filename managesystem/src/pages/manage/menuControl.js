@@ -1,30 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Modal, Form, Input, message, Select } from 'antd';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { isAuthorize } from '../../utils/authorize';
+import {
+  useNavigate
 
+} from 'react-router-dom';
 export function MenuControl() {
-  const [menus, setMenus] = useState([]);
-  const [filteredMenus, setFilteredMenus] = useState([]);
+  const [menus, setMenus] = useState(JSON.parse(localStorage.getItem('menus')) || []);
+  const [filteredMenus, setFilteredMenus] = useState(menus);
   const [addMenuVisible, setAddMenuVisible] = useState(false);
   const [editingMenu, setEditingMenu] = useState(null);
   const [form] = Form.useForm();
   const navigate = useNavigate();
-
   useEffect(() => {
-    fetchMenus();
-  }, [navigate]);
-
-  const fetchMenus = async () => {
-    try {
-      const response = await axios.get('http://localhost:6001/api/menus');
-      setMenus(response.data);
-      setFilteredMenus(response.data);
-    } catch (error) {
-      message.error('获取菜单数据失败');
-      console.error('获取菜单数据失败:', error);
+    if (!isAuthorize("菜单管理")) {
+      navigate('/manage/dashboard');
     }
-  };
+    if (!localStorage.getItem('menus')) {
+      localStorage.setItem('menus', JSON.stringify([]));
+    }
+  }, [navigate]);
 
   const pathValid = () => ({
     validator(_, value) {
@@ -75,47 +70,54 @@ export function MenuControl() {
     form.setFieldsValue(menu);
   };
 
-  const deleteMenu = async (title) => {
-    try {
-      const menuToDelete = menus.find(menu => menu.title === title);
-      if (menuToDelete && menuToDelete.parent === "") {
-        const childMenus = menus.filter(childMenu => childMenu.parent === title);
-        if (childMenus.length > 0) {
-          message.error('请先删除子菜单', 3);
-          return;
-        }
+  const deleteMenu = (title) => {
+    let menuToDelete = menus.find(menu => menu.title === title);
+    if (menuToDelete && menuToDelete.parent === "") {
+      let childMenus = menus.filter(childMenu => childMenu.parent === title);
+      if (childMenus.length > 0) {
+        message.error('请先删除子菜单', 3);
+        return;
       }
-      await axios.delete(`http://localhost:6001/api/menus/${title}`);
-      const updatedMenus = menus.filter(menu => menu.title !== title);
-      setMenus(updatedMenus);
-      setFilteredMenus(updatedMenus);
-    } catch (error) {
-      message.error('删除菜单失败');
-      console.error('删除菜单失败:', error);
     }
+
+    let updatedMenus = menus.filter(menu => menu.title !== title);
+
+    setMenus(updatedMenus);
+    setFilteredMenus(updatedMenus);
+    localStorage.setItem('menus', JSON.stringify(updatedMenus));
   };
 
-  const handleOk = async () => {
-    try {
-      const values = await form.validateFields();
+
+  const handleOk = () => {
+    form.validateFields().then(values => {
       if (!values.parent) {
         values.parent = '';
       }
+      // 检查标题是否重复
+      if (!editingMenu && menus.some(menu => menu.title === values.title)) {
+        message.error('标题已存在，请选择另一个标题!', 3);
+        return;
+      }
+
       let updatedMenus;
       if (editingMenu) {
-        await axios.put(`http://localhost:6001/api/menus/${editingMenu.title}`, values);
         updatedMenus = menus.map(menu => menu.title === editingMenu.title ? values : menu);
       } else {
-        await axios.post('http://localhost:6001/api/menus', values);
+        if (values.parent !== '') {
+          values.allowUser = [
+            '管理员'
+          ]
+        }
         updatedMenus = [...menus, values];
       }
       setMenus(updatedMenus);
       setFilteredMenus(updatedMenus);
+      localStorage.setItem('menus', JSON.stringify(updatedMenus));
       setAddMenuVisible(false);
-    } catch (error) {
-      message.error('保存菜单失败');
-      console.error('保存菜单失败:', error);
-    }
+      window.location.reload();
+    }).catch(info => {
+      console.log('Validate Failed:', info);
+    });
   };
 
   const handleCancel = () => {
@@ -127,6 +129,7 @@ export function MenuControl() {
     const filteredData = menus.filter(menu => menu.title.toLowerCase().includes(searchValue));
     setFilteredMenus(filteredData);
   };
+
 
   return (
     <div>
@@ -144,7 +147,10 @@ export function MenuControl() {
           <Form.Item name="title" label="Title" rules={[{ required: true, message: '请输入标题!' }]}>
             {editingMenu ? <Input disabled /> : <Input />}
           </Form.Item>
-          <Form.Item name="parent" label="Parent">
+          <Form.Item
+            name="parent"
+            label="Parent"
+          >
             <Select disabled={editingMenu && !form.getFieldValue('parent')}>
               <Select.Option key="root" value="">None</Select.Option>
               {menus.map(menu => {
@@ -164,6 +170,7 @@ export function MenuControl() {
           </Form.Item>
         </Form>
       </Modal>
-    </div>
+
+    </div >
   );
 }

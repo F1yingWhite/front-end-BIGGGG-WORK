@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Modal, Form, Input, Select, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { isAuthorize } from '../../utils/authorize';
 
 export function OrderControl() {
-  const [orders, setOrders] = useState([]);
+  const [orders, setOrders] = useState(JSON.parse(localStorage.getItem('orders')) || []);
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [addOrderVisible, setAddOrderVisible] = useState(false);
   const [editingOrder, setEditingOrder] = useState(null);
@@ -14,22 +14,72 @@ export function OrderControl() {
   const currentUser = localStorage.getItem('username');
   const userPrivilege = localStorage.getItem('privilege');
 
-  useEffect(() => {
-    fetchOrders();
-  }, [navigate]);
+  const columns = [
+    {
+      title: 'User ID',
+      dataIndex: 'userId',
+      key: 'userId',
+    },
+    {
+      title: 'Product ID',
+      dataIndex: 'productId',
+      key: 'productId',
+    },
+    {
+      title: 'Product Name',
+      dataIndex: 'productName',
+      key: 'productName',
+    },
+    {
+      title: 'Address',
+      dataIndex: 'address',
+      key: 'address',
+    },
+    {
+      title: 'Time',
+      dataIndex: 'time',
+      key: 'time',
+    },
+    {
+      title: 'Amount',
+      dataIndex: 'amount',
+      key: 'amount',
+    },
+    {
+      title: 'Price',
+      dataIndex: 'price',
+      key: 'price',
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      render: (text, record) => (
+        <span>
+          <Button onClick={() => editOrder(record)}>Edit</Button>
+        </span>
+      ),
+    },
+  ];
 
-  const fetchOrders = async () => {
-    try {
-      const response = await axios.get('http://localhost:6001/api/orders');
-      const ordersData = response.data;
-      const filtered = userPrivilege === '管理员' ? ordersData : ordersData.filter(order => order.sellerId === currentUser);
-      setOrders(filtered);
-      setFilteredOrders(filtered);
-    } catch (error) {
-      console.error('获取订单数据失败:', error);
-      message.error('获取订单数据失败');
+  useEffect(() => {
+    if (!isAuthorize('订单列表')) {
+      navigate('/manage/dashboard');
+      return;
     }
-  };
+    const filtered = userPrivilege === '管理员' ? orders : orders.filter(order => order.sellerId === currentUser);
+    setFilteredOrders(filtered);
+  }, [currentUser, orders, navigate, userPrivilege]);
+
+  // const addOrder = () => {
+  //   setEditingOrder(null);
+  //   setAddOrderVisible(true);
+  //   form.resetFields();
+  // };
 
   const editOrder = (order) => {
     setEditingOrder(order);
@@ -37,29 +87,20 @@ export function OrderControl() {
     form.setFieldsValue(order);
   };
 
-  const handleOk = async () => {
-    try {
-      const values = await form.validateFields();
+  const handleOk = () => {
+    form.validateFields().then(values => {
       let updatedOrders;
-
-      if (editingOrder) {
-        await axios.put(`http://localhost:6001/api/orders/${editingOrder.productId}`, values);
-        updatedOrders = orders.map(order => order.productId === editingOrder.productId ? { ...order, ...values } : order);
-        message.success('修改订单成功');
-      } else {
-        const newOrder = { ...values, id: Date.now().toString() };
-        await axios.post('http://localhost:6001/api/orders', newOrder);
-        updatedOrders = [...orders, newOrder];
-        message.success('添加订单成功');
+      if (values.sellerId === undefined) {
+        values.sellerId = currentUser;
       }
-
+      updatedOrders = orders.map(order => order.id === editingOrder.id ? values : order);
       setOrders(updatedOrders);
       setFilteredOrders(userPrivilege === '管理员' ? updatedOrders : updatedOrders.filter(order => order.sellerId === currentUser));
+      localStorage.setItem('orders', JSON.stringify(updatedOrders));
       setAddOrderVisible(false);
-    } catch (error) {
-      console.error('操作订单失败:', error);
-      message.error('操作订单失败');
-    }
+    }).catch(info => {
+      message.error('Validation failed');
+    });
   };
 
   const handleCancel = () => {
@@ -72,26 +113,6 @@ export function OrderControl() {
     setFilteredOrders(userPrivilege === '管理员' ? filteredData : filteredData.filter(order => order.sellerId === currentUser));
   };
 
-  const columns = [
-    { title: 'User ID', dataIndex: 'userId', key: 'userId' },
-    { title: 'Product ID', dataIndex: 'productId', key: 'productId' },
-    { title: 'Product Name', dataIndex: 'productName', key: 'productName' },
-    { title: 'Address', dataIndex: 'address', key: 'address' },
-    { title: 'Time', dataIndex: 'time', key: 'time' },
-    { title: 'Amount', dataIndex: 'amount', key: 'amount' },
-    { title: 'Price', dataIndex: 'price', key: 'price' },
-    { title: 'Status', dataIndex: 'status', key: 'status' },
-    {
-      title: 'Actions',
-      key: 'actions',
-      render: (text, record) => (
-        <span>
-          <Button onClick={() => editOrder(record)}>Edit</Button>
-        </span>
-      ),
-    },
-  ];
-
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
@@ -100,8 +121,9 @@ export function OrderControl() {
           onChange={handleSearch}
           style={{ width: '25%' }}
         />
+        {/* <Button type="primary" onClick={addOrder}>Add Order</Button> */}
       </div>
-      <Table dataSource={filteredOrders} columns={columns} rowKey="productId" pagination={{ pageSize: 7 }} />
+      <Table dataSource={filteredOrders} columns={columns} rowKey="id" pagination={{ pageSize: 7 }} />
       <Modal title="修改订单" open={addOrderVisible} onOk={handleOk} onCancel={handleCancel}>
         <Form form={form} layout="vertical" name="orderForm">
           <Form.Item name="userId" label="User ID" rules={[{ required: true, message: '请输入用户ID' }]}>
