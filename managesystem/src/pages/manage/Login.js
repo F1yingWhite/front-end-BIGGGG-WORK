@@ -1,47 +1,58 @@
-import React, { useState } from 'react';
-import { Form, Input, Button, Tabs, message, Typography } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Form, Input, Button, Tabs, message,Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import CryptoJS from 'crypto-js';
 import { passwordValid, emailValid } from '../../utils/userInfoVaild';
 
 export function Login() {
   const [activeKey, setActiveKey] = useState('1');
   const navigate = useNavigate();
 
-  const login = async (values) => {
-    try {
-      const response = await axios.post('/api/auth/login', {
-        username: values.username,
-        password: values.password, // 直接传输纯文本密码
-      });
-      const user = response.data.user;
-      message.success('登录成功', 3);
-      localStorage.setItem('isLogin', 'true'); // 设置登录状态
-      localStorage.setItem('username', user.username); // 设置用户名
-      localStorage.setItem('privilege', user.privilege); // 设置权限
-      navigate('/manage/dashboard'); // 跳转到首页
-    } catch (error) {
-      message.error('用户名或密码错误', 3);
+  useEffect(() => {
+  }, []);
+
+  const login = (values) => {
+    //查找用户是否存在
+    let users = JSON.parse(localStorage.getItem("user")) || [];
+    let user = users.find(user => user.username === values.username);
+    if (!user) {
+      message.error('用户不存在', 3);
+      return;
     }
+    let password = CryptoJS.SHA256(values.password).toString();
+    if (user.password !== password) {
+      message.error('密码错误', 3);
+      return;
+    }
+    message.success('登入成功', 3);
+    localStorage.setItem('isLogin', 'true'); // 设置登录状态
+    localStorage.setItem('username', user.username); // 设置用户名
+    localStorage.setItem('privilege', user.privilege); // 设置权限
+    navigate('/manage/dashboard'); // 跳转到首页
   };
 
-  const register = async (values) => {
-    try {
-      await axios.post('/api/auth/register', {
-        username: values.username,
-        password: values.password, // 直接传输纯文本密码
-        email: values.email,
-      });
-      message.success('注册成功', 3);
-      setActiveKey('1');
-    } catch (error) {
-      message.error('注册失败', 3);
+  const Register = (values) => {
+    let users = JSON.parse(localStorage.getItem("user")) || [];
+    //查重
+    if (users.find(user => user.username === values.username)) {
+      message.error('用户已存在', 3);
+      return;
     }
+    users.push({
+      username: values.username,
+      password: CryptoJS.SHA256(values.password).toString(),
+      email: values.email,
+      privilege: "普通用户"
+    });
+    localStorage.setItem("user", JSON.stringify(users));
+    setActiveKey('1');
+    message.success('注册成功', 3);
   };
+
 
   const items = [
     {
-      key: '1',
+      key: "1",
       label: <Typography.Title level={3}>登录</Typography.Title>,
       children: (
         <Form
@@ -78,8 +89,10 @@ export function Login() {
           >
             <Input.Password />
           </Form.Item>
-          <Form.Item style={{ marginLeft: '290px' }}>
-            <Button type="primary" htmlType="submit">
+          <Form.Item
+            style={{ marginLeft: '290px' }}
+          >
+            <Button type="primary" htmlType="submit" >
               登录
             </Button>
           </Form.Item>
@@ -87,12 +100,12 @@ export function Login() {
       ),
     },
     {
-      key: '2',
+      key: "2",
       label: <Typography.Title level={3}>注册</Typography.Title>,
       children: (
         <Form
           onFinish={(values) => {
-            register(values);
+            Register(values);
           }}
           labelCol={{
             span: 8,
@@ -158,8 +171,10 @@ export function Login() {
           >
             <Input.Password />
           </Form.Item>
-          <Form.Item style={{ marginLeft: '290px' }}>
-            <Button type="primary" htmlType="submit">
+          <Form.Item
+            style={{ marginLeft: '290px' }}
+          >
+            <Button type="primary" htmlType="submit" >
               注册
             </Button>
           </Form.Item>

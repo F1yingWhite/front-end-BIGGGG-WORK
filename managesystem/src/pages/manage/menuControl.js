@@ -93,6 +93,12 @@ export function MenuControl() {
       if (!values.parent) {
         values.parent = '';
       }
+      // 检查标题是否重复
+      if (!editingMenu && menus.some(menu => menu.title === values.title)) {
+        message.error('标题已存在，请选择另一个标题!', 3);
+        return;
+      }
+
       let updatedMenus;
       if (editingMenu) {
         updatedMenus = menus.map(menu => menu.title === editingMenu.title ? values : menu);
@@ -108,6 +114,7 @@ export function MenuControl() {
       setFilteredMenus(updatedMenus);
       localStorage.setItem('menus', JSON.stringify(updatedMenus));
       setAddMenuVisible(false);
+      window.location.reload();
     }).catch(info => {
       console.log('Validate Failed:', info);
     });
