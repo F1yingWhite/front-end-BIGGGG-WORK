@@ -8,7 +8,15 @@ import {
 } from '@ant-design/icons';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { isLogin } from '../../utils/authorize';
+
 const { Content, Footer } = Layout;
+
+const menuItems = [
+  { key: 'home', icon: <HomeOutlined style={{ fontSize: '24px' }} />, label: '主页' },
+  { key: 'categories', icon: <AppstoreOutlined style={{ fontSize: '24px' }} />, label: '分类' },
+  { key: 'cart', icon: <ShoppingCartOutlined style={{ fontSize: '24px' }} />, label: '购物车' },
+  { key: 'profile', icon: <UserOutlined style={{ fontSize: '24px' }} />, label: '个人主页' },
+];
 
 export function UserDashboard() {
   const [selectedKey, setSelectedKey] = useState('home');
@@ -22,18 +30,16 @@ export function UserDashboard() {
 
   useEffect(() => {
     if (!isLogin()) {
-      navigate('/user/login')
+      navigate('/user/login');
     }
-  }, [navigate])
+  }, [navigate]);
 
   useEffect(() => {
-    // Check if the current path is '/user/dashboard' and navigate to 'home'
     if (location.pathname === '/user/dashboard') {
       navigate('/user/dashboard/home');
       setSelectedKey('home');
     }
   }, [location, navigate]);
-
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
@@ -47,30 +53,14 @@ export function UserDashboard() {
           onClick={handleMenuClick}
           style={{ textAlign: 'center', display: 'flex', justifyContent: 'space-around' }}
         >
-          <Menu.Item key="home" style={{ flex: 1 }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-              <HomeOutlined style={{ fontSize: '24px' }} />
-              <span style={{ marginLeft: '0px' }}>主页</span>
-            </div>
-          </Menu.Item>
-          <Menu.Item key="categories" style={{ flex: 1 }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-              <AppstoreOutlined style={{ fontSize: '24px' }} />
-              <span style={{ marginLeft: '0' }}>分类</span>
-            </div>
-          </Menu.Item>
-          <Menu.Item key="cart" style={{ flex: 1 }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-              <ShoppingCartOutlined style={{ fontSize: '24px' }} />
-              <span style={{ marginLeft: '0px' }}>购物车</span>
-            </div>
-          </Menu.Item>
-          <Menu.Item key="profile" style={{ flex: 1 }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-              <UserOutlined style={{ fontSize: '24px' }} />
-              <span style={{ marginLeft: '0px' }}>个人主页</span>
-            </div>
-          </Menu.Item>
+          {menuItems.map((item) => (
+            <Menu.Item key={item.key} style={{ flex: 1 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', marginTop: '10px' }}>
+                {item.icon}
+                <span style={{ marginLeft: '0px' }}>{item.label}</span>
+              </div>
+            </Menu.Item>
+          ))}
         </Menu>
       </Footer>
     </Layout>
