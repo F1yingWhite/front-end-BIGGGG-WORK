@@ -1,0 +1,35 @@
+.classification-page {
+    display: flex;
+    height: 100vh;
+  }
+  
+  .category-list {
+    background-color: #f0f0f0;
+    overflow-y: auto;
+  }
+  
+  .category-list .ant-list-item {
+    cursor: pointer;
+    padding: 10px 20px;
+  }
+  
+  .category-list .ant-list-item.selected {
+    background-color: #ff4d4f;
+    color: white;
+  }
+  
+  .subcategory-list {
+    padding: 20px;
+  }
+  
+  .subcategory-item {
+    text-align: center;
+  }
+  
+  .subcategory-image {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    margin-bottom: 10px;
+  }
+  

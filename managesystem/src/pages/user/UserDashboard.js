@@ -19,13 +19,17 @@ const menuItems = [
 ];
 
 export function UserDashboard() {
-  const [selectedKey, setSelectedKey] = useState('home');
   const navigate = useNavigate();
   const location = useLocation();
+  let nowKey = location.pathname.split('/')
+
+  const [selectedKey, setSelectedKey] = useState(nowKey[nowKey.length - 1]);
 
   const handleMenuClick = ({ key }) => {
-    setSelectedKey(key);
-    navigate(`/user/dashboard/${key}`);
+    if (key !== selectedKey) {
+      setSelectedKey(key);
+      navigate(`/user/dashboard/${key}`);
+    }
   };
 
   useEffect(() => {
@@ -43,10 +47,10 @@ export function UserDashboard() {
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      <Content style={{ padding: '0 16px', marginTop: 64 }}>
+      <Content style={{ padding: '0', marginBottom: '60px' }}>
         <Outlet />
       </Content>
-      <Footer style={{ position: 'fixed', width: '100%', bottom: 0, padding: 0 }}>
+      <Footer style={{ position: 'fixed', width: '100%', bottom: 0, padding: 0, zIndex: 1000 }}>
         <Menu
           mode="horizontal"
           selectedKeys={[selectedKey]}
