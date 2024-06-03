@@ -15,8 +15,8 @@ const router = createBrowserRouter([
     children: userRouters
   },
   {
-    path: "*",
-    element: <Navigate to="/manage" />
+    // path: "*",
+    // element: <Navigate to="/manage" />
   }
 
 ]);

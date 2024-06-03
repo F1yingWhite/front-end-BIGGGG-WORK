@@ -4,6 +4,13 @@ import { ShoppingCart } from "../pages/user/ShoppingCart";
 import { UserDashboard } from "../pages/user/UserDashboard";
 import { UserLogin } from "../pages/user/UserLogin";
 import { UserPage } from "../pages/user/UserPage";
+import { ProductListPage } from "../pages/user/ProductListPage";
+import { ProductPage } from "../pages/user/ProductPage";
+import { CreateOrderPage } from "../pages/user/CreateOrderPage";
+import { PaymentPage } from "../pages/user/PaymentPage";
+import { PaymentSuccessPage } from "../pages/user/PaymentSuccessPage";
+import { OrderDetailsPage } from "../pages/user/OrderDetailsPage";
+import { OrderListPage } from "../pages/user/OrderListPage";
 
 const userRouters = [
   {
@@ -30,8 +37,36 @@ const userRouters = [
         path: "profile",
         element: <UserPage />
       },
+      {
+        path: "products",
+        element: <ProductListPage />
+      },
+      {
+        path: "product/:id",
+        element: <ProductPage />
+      },
+      {
+        path: "createOrder/:id",
+        element: <CreateOrderPage />
+      },
+      {
+        path: "payment/:id",
+        element: <PaymentPage />
+      },
+      {
+        path: "paymentSuccess/:id",
+        element: <PaymentSuccessPage />
+      },
+      {
+        path: "orderDetails/:id",
+        element: <OrderDetailsPage />
+      },
+      {
+        path: "orders",
+        element: <OrderListPage />
+      }
     ]
-  },
-]
+  }
+];
 
 export default userRouters;
