@@ -8,9 +8,9 @@ const getFileBase64 = async (url) => {
             resolve(reader.result);
         };
         reader.onerror = (error) => {
-            reject(error);
+            console.error('getFileBase64 error:', error);
         };
     });
 };
 
-export { getFileBase64}
+export { getFileBase64 }
