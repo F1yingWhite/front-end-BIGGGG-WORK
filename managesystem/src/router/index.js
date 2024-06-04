@@ -1,4 +1,4 @@
-import { createBrowserRouter, Outlet, Navigate } from "react-router-dom";
+import { createBrowserRouter, Outlet } from "react-router-dom";
 import userRouters from "./userRouters";
 import manageRouters from "./manageRouters";
 

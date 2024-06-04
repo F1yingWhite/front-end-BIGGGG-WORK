@@ -5,7 +5,7 @@ import './ClassificationPage.css';
 export function ClassificationPage() {
   const [classifications, setClassifications] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [subcategories, setSubcategories] = useState([]);
+  const [setSubcategories] = useState([]);
   const [allProducts, setAllProducts] = useState([]);
 
   useEffect(() => {
@@ -20,7 +20,7 @@ export function ClassificationPage() {
       setSelectedCategory(storedClassifications[0].name);
       setSubcategories(storedClassifications[0].subcategories || []);
     }
-  }, []);
+  }, [setSelectedCategory, setClassifications, setSubcategories]);
 
   const handleCategoryClick = (category) => {
     setSelectedCategory(category.name);
@@ -48,7 +48,7 @@ export function ClassificationPage() {
           <h2>{selectedCategory}</h2>
           <Row gutter={[16, 16]}>
             {allProducts.filter(product => product.classification === selectedCategory).map((product, index) => (
-              <Col key={index} span={12} style={{marginTop: '20px'}}>
+              <Col key={index} span={12} style={{ marginTop: '20px' }}>
                 <Card
                   hoverable
                   cover={<img alt={product.name} src={product.image} />}
