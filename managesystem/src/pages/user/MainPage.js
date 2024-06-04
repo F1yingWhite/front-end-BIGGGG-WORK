@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Input, Carousel, Card, Row, Col } from 'antd';
 import { ScanOutlined, HeartOutlined, FallOutlined, BulbOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 
 const { Search } = Input;
 
@@ -26,10 +27,16 @@ const brands = [
 export function MainPage() {
   const [hotProducts, setHotProducts] = useState([]);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     const storedProducts = JSON.parse(localStorage.getItem('products')) || [];
     setHotProducts(storedProducts);
   }, []);
+
+  const handleCardClick = (id) => {
+    navigate(`/user/dashboard/product/${id}`);
+  };
 
   return (
     <div style={{ padding: '0px' }}>
@@ -77,6 +84,7 @@ export function MainPage() {
             <Card
               hoverable
               cover={<img alt={product.name} src={product.image} />}
+              onClick={() => handleCardClick(product.id)}
             >
               <Card.Meta title={product.name} description={product.price + '￥'} />
             </Card>

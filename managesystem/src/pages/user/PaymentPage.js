@@ -10,7 +10,7 @@ export function PaymentPage() {
         const orders = JSON.parse(localStorage.getItem('orders')) || [];
         const orderIndex = orders.findIndex(order => order.id === id);
         if (orderIndex !== -1) {
-            orders[orderIndex].status = '已付款';
+            orders[orderIndex].status = '付款';
             localStorage.setItem('orders', JSON.stringify(orders));
             navigate(`/user/dashboard/paymentSuccess/${id}`);
         }

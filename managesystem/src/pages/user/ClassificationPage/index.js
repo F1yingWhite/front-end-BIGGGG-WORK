@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { List, Row, Col, Card } from 'antd';
+import { useNavigate } from 'react-router-dom';
 import './ClassificationPage.css';
 
 export function ClassificationPage() {
   const [classifications, setClassifications] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [setSubcategories] = useState([]);
+  const [subcategories, setSubcategories] = useState([]);
   const [allProducts, setAllProducts] = useState([]);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const products = JSON.parse(localStorage.getItem('products')) || [];
@@ -20,11 +23,15 @@ export function ClassificationPage() {
       setSelectedCategory(storedClassifications[0].name);
       setSubcategories(storedClassifications[0].subcategories || []);
     }
-  }, [setSelectedCategory, setClassifications, setSubcategories]);
+  }, []);
 
   const handleCategoryClick = (category) => {
     setSelectedCategory(category.name);
     setSubcategories(category.subcategories || []);
+  };
+
+  const handleCardClick = (id) => {
+    navigate(`/user/dashboard/product/${id}`);
   };
 
   return (
@@ -48,10 +55,11 @@ export function ClassificationPage() {
           <h2>{selectedCategory}</h2>
           <Row gutter={[16, 16]}>
             {allProducts.filter(product => product.classification === selectedCategory).map((product, index) => (
-              <Col key={index} span={12} style={{ marginTop: '20px' }}>
+              <Col key={index} span={12} style={{marginTop: '20px'}}>
                 <Card
                   hoverable
                   cover={<img alt={product.name} src={product.image} />}
+                  onClick={() => handleCardClick(product.id)}
                 >
                   <Card.Meta title={product.name} description={product.price + '￥'} />
                   <Card.Meta description={'库存' + product.stock + '件'} />
