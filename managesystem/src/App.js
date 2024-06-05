@@ -28,11 +28,10 @@ function App() {
 
   return (
     <ProductContext.Provider value={storage}>
-      {load ? (
-        <Spin spinning={load} fullscreen />
-      ) : (
-        <RouterProvider router={router} />
-      )}
+      {
+        load && <Spin spinning={load} fullscreen />
+      }
+      <RouterProvider router={router} />
     </ProductContext.Provider>
   );
 }
