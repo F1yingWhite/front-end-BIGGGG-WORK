@@ -12,11 +12,9 @@ function App() {
     });
   }, [setLoad]);
 
-
-
   return (
     <>
-       <Spin spinning={load} fullscreen />
+      <Spin spinning={load} fullscreen />
       <RouterProvider router={router} />
     </>
   );

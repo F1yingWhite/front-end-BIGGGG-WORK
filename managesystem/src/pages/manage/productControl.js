@@ -4,7 +4,7 @@ import { UploadOutlined } from '@ant-design/icons';
 import { v4 as uuidv4 } from 'uuid';
 import { isAuthorize } from '../../utils/authorize';
 import { useNavigate } from 'react-router-dom';
-
+import { IndexedDBStorage } from '../../utils/indexdb';
 const { Search } = Input;
 const { Option } = Select;
 
@@ -23,29 +23,56 @@ export function ProductControl() {
   const [addProductVisible, setAddProductVisible] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [fileList, setFileList] = useState([]);
-  const [mainImageFileList, setMainImageFileList] = useState([]);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState('');
   const [searchValue, setSearchValue] = useState('');
   const [sellers, setSellers] = useState([]);
   const [form] = Form.useForm();
-
+  const [storage, setStorage] = useState(null);
+  const [storageInitialized, setStorageInitialized] = useState(false);
   const privilege = localStorage.getItem("privilege");
   const username = localStorage.getItem("username");
   const navigate = useNavigate();
+
   useEffect(() => {
+    const initStorage = async () => {
+      let storage = new IndexedDBStorage('MyDatabase', 'products');
+      await storage.init();
+      setStorage(storage);
+      setStorageInitialized(true);
+    };
+    initStorage();
+
     if (!isAuthorize("商品列表")) {
       navigate('/manage/dashboard');
     }
-    const storedProducts = JSON.parse(localStorage.getItem('products')) || [];
-    const filtered = privilege === '管理员' ? storedProducts : storedProducts.filter(product => product.seller === username);
-    setProducts(filtered);
-    setFilteredProducts(filtered);
+  }, [navigate]);
 
-    const users = JSON.parse(localStorage.getItem('user')) || [];
-    const sellerUsers = users.filter(user => user.privilege === '商家').map(user => user.username);
-    setSellers(sellerUsers);
-  }, [privilege, username, navigate]);
+  useEffect(() => {
+    const fetchProducts = async () => {
+      if (storageInitialized && storage) {
+        try {
+          const storedProducts = await storage.getItem("products").then(product => product.value).catch(error => {
+            console.error("没找到" + error);
+            return [];
+          });
+          console.log(storedProducts);
+          const parsedProducts = storedProducts;
+          const filtered = privilege === '管理员' ? parsedProducts : parsedProducts.filter(product => product.seller === username);
+          setProducts(filtered);
+          setFilteredProducts(filtered);
+
+          const users = JSON.parse(localStorage.getItem('user')) || [];
+          const sellerUsers = users.filter(user => user.privilege === '商家').map(user => user.username);
+          setSellers(sellerUsers);
+        } catch (error) {
+          console.error('Error fetching products from IndexedDB:', error);
+        }
+      }
+    };
+
+    fetchProducts();
+  }, [privilege, username, storageInitialized, storage]);
 
   const handleSearch = e => {
     const value = e.target.value.toLowerCase();
@@ -57,7 +84,6 @@ export function ProductControl() {
   const addProduct = () => {
     setEditingProduct(null);
     setFileList([]);
-    setMainImageFileList([]);
     setAddProductVisible(true);
   };
 
@@ -71,12 +97,6 @@ export function ProductControl() {
         url: img,
       }))
     );
-    setMainImageFileList([{
-      uid: '-1',
-      name: 'main-image.png',
-      status: 'done',
-      url: product.image
-    }]);
     form.setFieldsValue({
       ...product,
     });
@@ -103,7 +123,7 @@ export function ProductControl() {
       setProducts(updatedProducts);
       setFilteredProducts(updatedProducts);
       setSearchValue('');
-      localStorage.setItem('products', JSON.stringify(updatedProducts));
+      await storage.setItem('products', JSON.stringify(updatedProducts));
       setAddProductVisible(false);
       form.resetFields();
     } catch (error) {
