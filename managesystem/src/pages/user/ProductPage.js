@@ -11,6 +11,8 @@ export function ProductPage() {
     const products = JSON.parse(localStorage.getItem('products')) || [];
     const selectedProduct = products.find((product) => product.id === id);
     setProduct(selectedProduct);
+    console.log(id);
+    console.log(selectedProduct);
   }, [id]);
 
   const handleBuyNow = () => {
@@ -24,7 +26,7 @@ export function ProductPage() {
       <h1 style={styles.title}>{product.name}</h1>
       <Row gutter={[16, 16]}>
         <Col span={12}>
-          <Image src={product.image} alt={product.name} style={styles.image} />
+          <Image src={product.imageList[0]} alt={product.name} style={styles.image} />
         </Col>
         <Col span={12}>
           <p style={styles.price}>价格: ￥{product.price}</p>

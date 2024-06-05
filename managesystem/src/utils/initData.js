@@ -1546,7 +1546,7 @@ async function initData() {
     for (let i = 0; i < phone_product.length; i++) {
       //随机生成uid
       phone_product[i].name = phone_product[i].product_name;
-      phone_product[i].id = i;
+      phone_product[i].id = i.toString();
       phone_product[i].seller = "seller";
       phone_product[i].classification = "手机数码";
       phone_product[i].price = parseFloat(phone_product[i].product_price);
