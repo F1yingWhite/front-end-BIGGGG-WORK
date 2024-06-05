@@ -1,6 +1,6 @@
 import { ClassificationPage } from "../pages/user/ClassificationPage";
 import { MainPage } from "../pages/user/MainPage";
-import { ShoppingCart } from "../pages/user/ShoppingCart";
+import  ShoppingCart  from "../pages/user/ShoppingCart";
 import { UserDashboard } from "../pages/user/UserDashboard";
 import { UserLogin } from "../pages/user/UserLogin";
 import { UserPage } from "../pages/user/UserPage";
