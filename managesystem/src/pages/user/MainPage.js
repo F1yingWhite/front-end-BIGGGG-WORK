@@ -26,6 +26,7 @@ const brands = [
 
 export function MainPage() {
   const [hotProducts, setHotProducts] = useState([]);
+  const [allProducts, setAllProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(4);
   const storage = useContext(ProductContext);
@@ -36,7 +37,9 @@ export function MainPage() {
       try {
         const storedProducts = await storage.getItem('products').then(products => products.value);
         setHotProducts(storedProducts);
+        setAllProducts(storedProducts);
       } catch (error) {
+        setAllProducts([])
         setHotProducts([]);
       }
     };
@@ -58,6 +61,11 @@ export function MainPage() {
   const startIndex = (currentPage - 1) * pageSize;
   const currentProducts = hotProducts.slice(startIndex, startIndex + pageSize);
 
+  const handleSearch = (value) => {
+    const filteredProducts = allProducts.filter(product => product.name.includes(value));
+    setHotProducts(filteredProducts);
+  }
+
   return (
     <div style={{ padding: '0px' }}>
       <div style={{ backgroundColor: "rgb(204, 85, 61)", padding: '20px' }}>
@@ -65,7 +73,7 @@ export function MainPage() {
           placeholder="搜索商品"
           enterButton="搜索"
           size="large"
-          onSearch={value => console.log(value)}
+          onSearch={handleSearch}
           style={{ marginBottom: '20px' }}
           addonBefore={<ScanOutlined />}
         />
