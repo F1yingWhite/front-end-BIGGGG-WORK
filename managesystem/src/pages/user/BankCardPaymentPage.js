@@ -33,7 +33,11 @@ const styles = {
         fontSize: '18px',
         marginBottom: '20px',
     },
+    // 红色颜色
+
     button: {
         width: '100%',
+        backgroundColor: 'red',
     },
+
 };

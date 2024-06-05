@@ -79,6 +79,9 @@ const styles = {
         marginBottom: '10px',
     },
     button: {
-        width: '100%',
+        width: '80%',
+        backgroundColor: '#ffa500',
+        borderColor: '#ffa500',
+        marginBottom: '10px',
     },
 };

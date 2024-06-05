@@ -14,7 +14,7 @@ export function WeChatPaymentPage() {
         <div style={styles.container}>
             <h1 style={styles.title}>微信付款</h1>
             <p style={styles.instruction}>请扫描以下二维码进行支付：</p>
-             <img src={`${process.env.PUBLIC_URL}/assets/wechat.png`} alt="WeChat Pay" style={styles.image} />
+            <img src={`${process.env.PUBLIC_URL}/assets/wechat.png`} alt="WeChat Pay" style={styles.image} />
             <Button type="primary" onClick={handleProceedToConfirm} style={styles.button}>继续</Button>
         </div>
     );
@@ -33,7 +33,9 @@ const styles = {
         fontSize: '18px',
         marginBottom: '20px',
     },
+    // 颜色绿色
     button: {
         width: '100%',
+        backgroundColor: 'green',
     },
 };
