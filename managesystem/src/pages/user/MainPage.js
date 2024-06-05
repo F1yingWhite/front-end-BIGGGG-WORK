@@ -6,10 +6,10 @@ import { ProductContext } from '../../App';
 const { Search } = Input;
 
 const carouselImages = [
-  'https://via.placeholder.com/800x300?text=Image+1',
-  'https://via.placeholder.com/800x300?text=Image+2',
-  'https://via.placeholder.com/800x300?text=Image+3',
-  'https://via.placeholder.com/800x300?text=Image+4',
+  'https://th.bing.com/th/id/R.630e1bfe6676cd53bca93f0cd0e7b852?rik=7MJBN%2firDzd8jg&riu=http%3a%2f%2fimages.osogoo.com%2farticle%2fab15d2e31b53f9b4cd%2f201910081101509971.jpg&ehk=l1DTlIu5uXQiKdZI2pwmJ2p%2b09kNREeN0t1PkUqrz4M%3d&risl=&pid=ImgRaw&r=0',
+  'https://img.zcool.cn/community/01d9e258d0ccc4a801219c77a0fa44.jpg@2o.jpg',
+  'https://www.zcsj-cn.com/uploads/allimg/220902/1-220Z20933343L.jpg',
+  'https://th.bing.com/th/id/R.88c8ab1c4ca82125f41a9ccd893f5441?rik=PgLMSGlZBq89MA&riu=http%3a%2f%2fimg95.699pic.com%2fphoto%2f50064%2f2743.jpg_wh860.jpg&ehk=H9HL%2bpw4Q0X6mJ1dtX971YAdFbeaHVveGmddr63AkyU%3d&risl=&pid=ImgRaw&r=0',
 ];
 
 const categories = [
@@ -17,11 +17,6 @@ const categories = [
   { icon: <ScanOutlined style={{ fontSize: '32px' }} />, label: '活动' },
   { icon: <HeartOutlined style={{ fontSize: '32px' }} />, label: '优选' },
   { icon: <FallOutlined style={{ fontSize: '32px' }} />, label: '特惠' },
-];
-
-const brands = [
-  { name: '小米', image: 'https://via.placeholder.com/100', products: 100 },
-  { name: '华为', image: 'https://via.placeholder.com/100', products: 100 },
 ];
 
 export function MainPage() {
@@ -39,7 +34,7 @@ export function MainPage() {
         setHotProducts(storedProducts);
         setAllProducts(storedProducts);
       } catch (error) {
-        setAllProducts([])
+        setAllProducts([]);
         setHotProducts([]);
       }
     };
@@ -64,7 +59,8 @@ export function MainPage() {
   const handleSearch = (value) => {
     const filteredProducts = allProducts.filter(product => product.name.includes(value));
     setHotProducts(filteredProducts);
-  }
+    setCurrentPage(1); // 重置到第一页
+  };
 
   return (
     <div style={{ padding: '0px' }}>
@@ -80,7 +76,7 @@ export function MainPage() {
         <Carousel autoplay>
           {carouselImages.map((src, index) => (
             <div key={index}>
-              <img src={src} alt={`carousel-${index}`} style={{ width: '100%', height: '200px', objectFit: 'cover' }} />
+              <img src={src} alt={`carousel-${index}`} style={{ width: '100%', height: '240px', objectFit: 'cover' }} />
             </div>
           ))}
         </Carousel>
@@ -94,18 +90,7 @@ export function MainPage() {
         </div>
       </div>
 
-      <h2 style={{ marginTop: '20px', paddingLeft: '10px' }}>品牌制造商直供</h2>
-      <Row gutter={[16, 16]} style={{ margin: '10px' }}>
-        {brands.map((brand, index) => (
-          <Col key={index} span={12} style={{ textAlign: 'center' }}>
-            <img src={brand.image} alt={brand.name} style={{ width: '80px', height: '80px', objectFit: 'cover' }} />
-            <div>{brand.name}</div>
-            <div>商品数量：{brand.products}</div>
-          </Col>
-        ))}
-      </Row>
-
-      <h2 style={{ marginTop: '20px', paddingLeft: '10px' }}>热门商品</h2>
+      <h2 style={{ marginTop: '20px', paddingLeft: '10px', fontSize: '24px' }}>热门商品</h2>
       <Row gutter={[16, 16]} style={{ margin: '10px' }}>
         {currentProducts.map((product, index) => (
           <Col key={index} span={12}>

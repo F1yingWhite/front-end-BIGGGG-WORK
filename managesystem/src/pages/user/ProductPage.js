@@ -38,7 +38,7 @@ export function ProductPage() {
         <Col span={24}>
           <Carousel autoplay>
             {product.carousel_images.map((img, index) => (
-              <div key={index}>
+              <div key={index} style={styles.carouselImageContainer}>
                 <Image src={img} alt={`${product.name} ${index + 1}`} style={styles.carouselImage} />
               </div>
             ))}
@@ -96,10 +96,15 @@ const styles = {
   cartButton: {
     width: '100%',
   },
+  carouselImageContainer: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   carouselImage: {
-    width: '100%',
-    height: '300px',
-    objectFit: 'cover',
+    maxWidth: '100%',
+    maxHeight: '100%',
+    objectFit: 'contain',
   },
   imagesContainer: {
     marginTop: '20px',

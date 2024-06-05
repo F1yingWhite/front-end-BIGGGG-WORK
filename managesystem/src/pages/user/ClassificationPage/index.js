@@ -61,7 +61,7 @@ export function ClassificationPage() {
   return (
     <div className="classification-page">
       <Row>
-        <Col span={6} className="category-list">
+        <Col span={4} className="category-list">
           <List
             bordered
             dataSource={classifications}
@@ -75,8 +75,8 @@ export function ClassificationPage() {
             )}
           />
         </Col>
-        <Col span={18} className="subcategory-list">
-          <h2>{selectedCategory}</h2>
+        <Col span={20} className="subcategory-list">
+          <h2 style={{fontSize:"24px"}}>{selectedCategory}</h2>
           <Row gutter={[16, 16]}>
             {currentProducts.map((product, index) => (
               <Col key={index} span={12} style={{ marginTop: '20px' }}>
