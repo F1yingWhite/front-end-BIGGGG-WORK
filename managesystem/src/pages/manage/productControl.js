@@ -53,10 +53,8 @@ export function ProductControl() {
       if (storageInitialized && storage) {
         try {
           const storedProducts = await storage.getItem("products").then(product => product.value).catch(error => {
-            console.error("没找到" + error);
             return [];
           });
-          console.log(storedProducts);
           const parsedProducts = storedProducts;
           const filtered = privilege === '管理员' ? parsedProducts : parsedProducts.filter(product => product.seller === username);
           setProducts(filtered);
