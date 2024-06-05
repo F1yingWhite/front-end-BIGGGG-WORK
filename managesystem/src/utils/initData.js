@@ -1558,6 +1558,8 @@ async function initData() {
       }
       products.push(phone_product[i]);
     }
+    
+    
     localStorage.setItem('products', JSON.stringify(products));
   }
 
