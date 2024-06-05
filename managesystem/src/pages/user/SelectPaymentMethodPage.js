@@ -9,8 +9,11 @@ export function SelectPaymentMethodPage() {
     const handleSelectPaymentMethod = (method) => {
         if (method === '支付宝') {
             navigate(`/user/dashboard/alipay/${id}`);
+        } else if (method === '微信') {
+            navigate(`/user/dashboard/wechatpay/${id}`);
+        } else if (method === '银行卡') {
+            navigate(`/user/dashboard/bankcardpay/${id}`);
         }
-        // 可以在这里添加其他支付方式的处理逻辑
     };
 
     return (
