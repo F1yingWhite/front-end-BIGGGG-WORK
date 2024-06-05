@@ -80,12 +80,13 @@ export function ClassificationPage() {
             ))}
           </Row>
           <Pagination
+            size='small'
             current={currentPage}
             pageSize={pageSize}
             total={filteredProducts.length}
             onChange={handlePageChange}
-            style={{ textAlign: 'center', marginTop: '20px', marginBottom: '40px' }}
-            hideOnSinglePage={true}
+            style={{ textAlign: 'center', marginTop: '20px', marginBottom: '70px' }}
+            hideOnSinglePage='true'
           />
         </Col>
       </Row>
