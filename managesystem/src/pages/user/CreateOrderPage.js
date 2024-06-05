@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Form, Input, Button } from 'antd';
+import { v4 as uuidv4 } from 'uuid';
 
 export function CreateOrderPage() {
     const { id } = useParams();
@@ -17,7 +18,7 @@ export function CreateOrderPage() {
         const orders = JSON.parse(localStorage.getItem('orders')) || [];
         const newOrder = {
             ...values,
-            id: `order-${Date.now()}`,
+            id: uuidv4(),  // 使用 uuidv4() 生成唯一ID
             productId: product.id,
             productName: product.name,
             price: product.price,

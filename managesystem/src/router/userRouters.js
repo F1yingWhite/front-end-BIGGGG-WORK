@@ -8,6 +8,10 @@ import { ProductListPage } from "../pages/user/ProductListPage";
 import { ProductPage } from "../pages/user/ProductPage";
 import { CreateOrderPage } from "../pages/user/CreateOrderPage";
 import { PaymentPage } from "../pages/user/PaymentPage";
+import { SelectPaymentMethodPage } from "../pages/user/SelectPaymentMethodPage";
+import { AlipayPaymentPage } from "../pages/user/AlipayPaymentPage";
+import { AlipayConfirmPage } from "../pages/user/AlipayConfirmPage";
+import { AlipaySuccessPage } from "../pages/user/AlipaySuccessPage";
 import { PaymentSuccessPage } from "../pages/user/PaymentSuccessPage";
 import { OrderDetailsPage } from "../pages/user/OrderDetailsPage";
 import { OrderListPage } from "../pages/user/OrderListPage";
@@ -52,6 +56,22 @@ const userRouters = [
       {
         path: "payment/:id",
         element: <PaymentPage />
+      },
+      {
+        path: "selectPaymentMethod/:id",
+        element: <SelectPaymentMethodPage />
+      },
+      {
+        path: "alipay/:id",
+        element: <AlipayPaymentPage />
+      },
+      {
+        path: "alipayConfirm/:id",
+        element: <AlipayConfirmPage />
+      },
+      {
+        path: "alipaySuccess/:id",
+        element: <AlipaySuccessPage />
       },
       {
         path: "paymentSuccess/:id",

@@ -1,5 +1,6 @@
 import CryptoJS from "crypto-js";
 import { getFileBase64 } from "./img2base64";
+import { v4 as uuidv4 } from "uuid";
 
 async function initData() {
   let users = JSON.parse(localStorage.getItem("user")) || [];
@@ -137,12 +138,13 @@ async function initData() {
     products.push(product);
     localStorage.setItem('products', JSON.stringify(products));
   }
-  
+
   //订单的格式：用户姓名，商品id，订单商品，订单地址，订单时间，订单数量，订单金额，订单状态（付款-发货-收获）
   let orders = JSON.parse(localStorage.getItem('orders')) || [];
   if (orders.length === 0) {
     orders = [
       {
+        id: uuidv4(),
         userId: "user",
         sellerId: "seller",
         productId: products[0].id,
@@ -156,9 +158,9 @@ async function initData() {
     ];
     localStorage.setItem('orders', JSON.stringify(orders));
   }
-  let classificiations = JSON.parse(localStorage.getItem('classifications')) || [];
-  if (classificiations.length === 0) {
-    classificiations = [
+  let classifications = JSON.parse(localStorage.getItem('classifications')) || [];
+  if (classifications.length === 0) {
+    classifications = [
       {
         name: "手机数码",
       },
@@ -175,7 +177,7 @@ async function initData() {
         name: "电脑办公",
       }
     ];
-    localStorage.setItem('classifications', JSON.stringify(classificiations));
+    localStorage.setItem('classifications', JSON.stringify(classifications));
   }
 }
 
