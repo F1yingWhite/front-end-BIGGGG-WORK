@@ -2,12 +2,12 @@ import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from 'antd';
 
-export function PaymentConfirmPage() {
+export function AlipayConfirmPage() {
   const { id } = useParams();
   const navigate = useNavigate();
 
   const handlePaymentSuccess = () => {
-    navigate(`/user/dashboard/paymentSuccess/${id}`);
+    navigate(`/user/dashboard/alipaySuccess/${id}`);
   };
 
   return (
@@ -21,23 +21,18 @@ export function PaymentConfirmPage() {
 
 const styles = {
   container: {
-    padding: '20px',
+    padding: '10px',
     fontFamily: 'Arial, sans-serif',
-    textAlign: 'center',
   },
   title: {
-    fontSize: '26px',
-    marginBottom: '20px',
-    color: '#333',
+    fontSize: '24px',
+    marginBottom: '10px',
   },
   instruction: {
     fontSize: '18px',
     marginBottom: '20px',
-    color: '#555',
   },
   button: {
-    width: '80%',
-    backgroundColor: '#ffa500',
-    borderColor: '#ffa500',
+    width: '100%',
   },
 };
