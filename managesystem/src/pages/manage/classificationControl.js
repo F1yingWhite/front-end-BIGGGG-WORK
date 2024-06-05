@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Table, Input, Button, Modal, Form, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { isAuthorize } from '../../utils/authorize';
-import { IndexedDBStorage } from '../../utils/indexdb';
+import { ProductContext } from '../../App';
 
 export function ClassificationControl() {
   const [classifications, setClassifications] = useState(JSON.parse(localStorage.getItem("classifications")) || []);
@@ -11,18 +11,9 @@ export function ClassificationControl() {
   const [editingClassification, setEditingClassification] = useState(null);
   const [form] = Form.useForm();
   const navigate = useNavigate();
-  const [storage, setStorage] = useState(null);
-  const [storageInitialized, setStorageInitialized] = useState(false);
+  const storage = useContext(ProductContext);
 
   useEffect(() => {
-    const initStorage = async () => {
-      const storage = new IndexedDBStorage('MyDatabase', 'products');
-      await storage.init();
-      setStorage(storage);
-      setStorageInitialized(true);
-    };
-    initStorage();
-
     if (!isAuthorize('分类列表')) {
       navigate('/manage/dashboard');
     }

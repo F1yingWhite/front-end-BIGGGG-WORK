@@ -19,7 +19,7 @@ async function initProducts(productStorage) {
   });
 
   if (products.length === 0) {
-    const tags = ['手机数码', '电脑办公', '汽车用品', '家用电器'];
+    const tags = ['手机数码', '电脑办公', '汽车用品', '家用电器', '家居家装'];
     const fetchPromises = tags.map(tag =>
       fetch(`${process.env.PUBLIC_URL}/data/${tag}.json`)
         .then((response) => response.json())
