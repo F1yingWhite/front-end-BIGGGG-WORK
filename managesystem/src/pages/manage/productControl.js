@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Table, Input, Button, Modal, Form, Upload, Image, Select, message } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { v4 as uuidv4 } from 'uuid';
 import { isAuthorize } from '../../utils/authorize';
 import { useNavigate } from 'react-router-dom';
-import { IndexedDBStorage } from '../../utils/indexdb';
+import { ProductContext } from '../../App';
+
 const { Search } = Input;
 const { Option } = Select;
 
@@ -28,21 +29,12 @@ export function ProductControl() {
   const [searchValue, setSearchValue] = useState('');
   const [sellers, setSellers] = useState([]);
   const [form] = Form.useForm();
-  const [storage, setStorage] = useState(null);
-  const [storageInitialized, setStorageInitialized] = useState(false);
   const privilege = localStorage.getItem("privilege");
   const username = localStorage.getItem("username");
   const navigate = useNavigate();
+  const storage = useContext(ProductContext);
 
   useEffect(() => {
-    const initStorage = async () => {
-      let storage = new IndexedDBStorage('MyDatabase', 'products');
-      await storage.init();
-      setStorage(storage);
-      setStorageInitialized(true);
-    };
-    initStorage();
-
     if (!isAuthorize("商品列表")) {
       navigate('/manage/dashboard');
     }
@@ -50,7 +42,7 @@ export function ProductControl() {
 
   useEffect(() => {
     const fetchProducts = async () => {
-      if (storageInitialized && storage) {
+      if (storage) {
         try {
           const storedProducts = await storage.getItem("products").then(product => product.value).catch(error => {
             return [];
@@ -70,7 +62,7 @@ export function ProductControl() {
     };
 
     fetchProducts();
-  }, [privilege, username, storageInitialized, storage]);
+  }, [privilege, username, storage]);
 
   const handleSearch = e => {
     const value = e.target.value.toLowerCase();

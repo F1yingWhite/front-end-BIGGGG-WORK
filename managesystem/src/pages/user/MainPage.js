@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Input, Carousel, Card, Row, Col, Pagination } from 'antd';
 import { ScanOutlined, HeartOutlined, FallOutlined, BulbOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-
+import { ProductContext } from '../../App';
 const { Search } = Input;
 
 const carouselImages = [
@@ -28,13 +28,23 @@ export function MainPage() {
   const [hotProducts, setHotProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(4);
-
+  const storage = useContext(ProductContext);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedProducts = JSON.parse(localStorage.getItem('products')) || [];
-    setHotProducts(storedProducts);
-  }, []);
+    const fetchProducts = async () => {
+      try {
+        const storedProducts = await storage.getItem('products').then(products => products.value);
+        setHotProducts(storedProducts);
+      } catch (error) {
+        setHotProducts([]);
+      }
+    };
+
+    if (storage) {
+      fetchProducts();
+    }
+  }, [storage]);
 
   const handleCardClick = (id) => {
     navigate(`/user/dashboard/product/${id}`);
@@ -106,7 +116,7 @@ export function MainPage() {
         pageSize={pageSize}
         total={hotProducts.length}
         onChange={handlePageChange}
-        style={{ textAlign: 'center', marginTop: '20px', marginBottom:'40px' }}
+        style={{ textAlign: 'center', marginTop: '20px', marginBottom: '40px' }}
       />
     </div>
   );

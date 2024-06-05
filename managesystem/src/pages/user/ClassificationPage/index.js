@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { List, Row, Col, Card, Pagination } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import './ClassificationPage.css';
+import { ProductContext } from '../../../App';
 
 export function ClassificationPage() {
   const [classifications, setClassifications] = useState([]);
@@ -10,13 +11,24 @@ export function ClassificationPage() {
   const [allProducts, setAllProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(6);
+  const storage = useContext(ProductContext);
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    const products = JSON.parse(localStorage.getItem('products')) || [];
-    setAllProducts(products);
-  }, []);
+    const fetchProducts = async () => {
+      try {
+        const storedProducts = await storage.getItem('products').then(products => products.value);
+        setAllProducts(storedProducts);
+      } catch (error) {
+        setAllProducts([]);
+      }
+    };
+    if (storage) {
+      fetchProducts();
+    }
+
+  }, [storage]);
 
   useEffect(() => {
     const storedClassifications = JSON.parse(localStorage.getItem('classifications')) || [];

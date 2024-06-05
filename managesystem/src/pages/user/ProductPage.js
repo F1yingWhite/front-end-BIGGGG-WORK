@@ -1,19 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Image, Row, Col, Carousel } from 'antd';
+import { ProductContext } from '../../App';
 
 export function ProductPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
+  const storage = useContext(ProductContext);
 
   useEffect(() => {
-    const products = JSON.parse(localStorage.getItem('products')) || [];
-    const selectedProduct = products.find((product) => product.id === id);
-    setProduct(selectedProduct);
-    console.log(id);
-    console.log(selectedProduct);
-  }, [id]);
+    var products = [];
+    const fetchProducts = async () => {
+      try {
+        const storedProducts = await storage.getItem('products').then(products => products.value);
+        products = storedProducts;
+        const selectedProduct = products.find((product) => product.id === id);
+        setProduct(selectedProduct);
+      } catch (error) {
+        products = [];
+      }
+    };
+    if (storage) {
+      fetchProducts();
+    }
+  }, [id, storage]);
 
   const handleBuyNow = () => {
     navigate(`/user/dashboard/createOrder/${id}`);
