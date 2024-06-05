@@ -19,17 +19,21 @@ export function Dashboard() {
 
   const renderMenuItems = (menuData, userPrivilege) => {
     const menus = JSON.parse(menuData);
+
     const buildMenuItems = (menus, parent = "") => {
       const result = [];
       for (const menu of menus) {
-        if (menu.parent === parent && (menu.parent === "" || menu.allowUser.includes(userPrivilege))) {
+        if (
+          menu.parent === parent &&
+          (menu.parent === "" || !menu.allowUser || menu.allowUser.includes(userPrivilege))
+        ) {
           const children = buildMenuItems(menus, menu.title);
           const menuItem = {
             key: menu.title,
             label: menu.title,
             children: children.length > 0 ? children : null,
             onClick: () => {
-              if (menu.parent !== "") {
+              if (menu.path) {
                 navigate("/manage/dashboard" + menu.path);
               }
             },
@@ -39,6 +43,7 @@ export function Dashboard() {
       }
       return result;
     };
+
     let items = buildMenuItems(menus);
     return items;
   };
