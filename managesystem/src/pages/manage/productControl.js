@@ -89,15 +89,14 @@ export function ProductControl() {
       const imageList = await Promise.all(
         fileList.map(async (file) => file.url || await getBase64(file.originFileObj))
       );
-      const mainImage = mainImageFileList[0]?.url || await getBase64(mainImageFileList[0].originFileObj);
 
       let updatedProducts;
       if (editingProduct) {
         updatedProducts = products.map(product =>
-          product.id === editingProduct.id ? { ...product, ...values, image: mainImage, imageList } : product
+          product.id === editingProduct.id ? { ...product, ...values, imageList: imageList } : product
         );
       } else {
-        const newProduct = { ...values, id: uuidv4(), image: mainImage, imageList, seller: privilege === '管理员' ? values.seller : username };
+        const newProduct = { ...values, id: uuidv4(), imageList: imageList, seller: privilege === '管理员' ? values.seller : username };
         updatedProducts = [...products, newProduct];
       }
 
@@ -115,10 +114,6 @@ export function ProductControl() {
   const handleCancel = () => {
     setAddProductVisible(false);
     form.resetFields();
-  };
-
-  const handleMainImageChange = ({ fileList: newFileList }) => {
-    setMainImageFileList(newFileList.slice(-1));
   };
 
   const handleImageListChange = ({ fileList: newFileList }) => {
@@ -139,7 +134,6 @@ export function ProductControl() {
 
   const columns = [
     { title: '商品名称', dataIndex: 'name', key: 'name' },
-    { title: '商品图片', dataIndex: 'image', key: 'image', render: text => <img src={text} alt="product" style={{ width: 50, minWidth: 20, minHeight: 20 }} /> },
     { title: '商品价格', dataIndex: 'price', key: 'price' },
     { title: '库存', dataIndex: 'stock', key: 'stock' },
     { title: '销量', dataIndex: 'sales', key: 'sales' },
@@ -175,17 +169,6 @@ export function ProductControl() {
                 </Option>
               ))}
             </Select>
-          </Form.Item>
-          <Form.Item name="image" label="商品图片" rules={[{ required: true, message: '请上传商品图片!' }]}>
-            <Upload
-              action="/assets"
-              listType="picture-card"
-              fileList={mainImageFileList}
-              onPreview={handlePreview}
-              onChange={handleMainImageChange}
-            >
-              {mainImageFileList.length >= 1 ? null : uploadButton}
-            </Upload>
           </Form.Item>
           <Form.Item name="price" label="商品价格" rules={[{ required: true, message: '请输入商品价格!' }]}>
             <Input type="number" />
