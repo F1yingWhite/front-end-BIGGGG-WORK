@@ -19,7 +19,7 @@ export function Dashboard() {
 
   const renderMenuItems = (menuData, userPrivilege) => {
     const menus = JSON.parse(menuData);
-  
+
     const buildMenuItems = (menus, parent = "") => {
       const result = [];
       for (const menu of menus) {
@@ -43,7 +43,7 @@ export function Dashboard() {
       }
       return result;
     };
-  
+
     let items = buildMenuItems(menus);
     return items;
   };
