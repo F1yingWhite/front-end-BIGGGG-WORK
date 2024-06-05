@@ -1567,11 +1567,15 @@ async function initData() {
   if (orders.length === 0) {
     orders = [
       {
+        id: uuidv4(),
         userId: "user",
         sellerId: "seller",
         productId: products[0].id,
         productName: products[0].name,
         address: "北京市海淀区",
+        receiverName: "张三",
+        receiverPhone: "13800000000",
+        remark: "请尽快发货",
         time: new Date().toLocaleString(),
         amount: 1,
         price: 8848,
