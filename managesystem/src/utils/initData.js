@@ -1,5 +1,6 @@
 import CryptoJS from "crypto-js";
 import { getFileBase64 } from "./img2base64";
+import { v4 as uuidv4 } from "uuid";
 
 async function initData() {
   let users = JSON.parse(localStorage.getItem("user")) || [];
@@ -1568,12 +1569,15 @@ async function initData() {
   if (orders.length === 0) {
     orders = [
       {
-        orderId: "d40a23da6-628a-4f08-b9e6-dzcea3d20c3fc",
+        id: uuidv4(),
         userId: "user",
         sellerId: "seller",
         productId: products[0].id,
         productName: products[0].name,
         address: "北京市海淀区",
+        receiverName: "张三",
+        receiverPhone: "13800000000",
+        remark: "请尽快发货",
         time: new Date().toLocaleString(),
         amount: 1,
         price: 8848,
@@ -1582,9 +1586,9 @@ async function initData() {
     ];
     localStorage.setItem('orders', JSON.stringify(orders));
   }
-  let classificiations = JSON.parse(localStorage.getItem('classifications')) || [];
-  if (classificiations.length === 0) {
-    classificiations = [
+  let classifications = JSON.parse(localStorage.getItem('classifications')) || [];
+  if (classifications.length === 0) {
+    classifications = [
       {
         name: "手机数码",
       },
@@ -1601,7 +1605,7 @@ async function initData() {
         name: "电脑办公",
       }
     ];
-    localStorage.setItem('classifications', JSON.stringify(classificiations));
+    localStorage.setItem('classifications', JSON.stringify(classifications));
   }
 }
 
