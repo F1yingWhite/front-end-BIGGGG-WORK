@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Input, Carousel, Card, Row, Col } from 'antd';
+import { Input, Carousel, Card, Row, Col, Pagination } from 'antd';
 import { ScanOutlined, HeartOutlined, FallOutlined, BulbOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 
 const { Search } = Input;
 
@@ -25,11 +26,27 @@ const brands = [
 
 export function MainPage() {
   const [hotProducts, setHotProducts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(4);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const storedProducts = JSON.parse(localStorage.getItem('products')) || [];
     setHotProducts(storedProducts);
   }, []);
+
+  const handleCardClick = (id) => {
+    navigate(`/user/dashboard/product/${id}`);
+  };
+
+  const handlePageChange = (page, pageSize) => {
+    setCurrentPage(page);
+    setPageSize(pageSize);
+  };
+
+  const startIndex = (currentPage - 1) * pageSize;
+  const currentProducts = hotProducts.slice(startIndex, startIndex + pageSize);
 
   return (
     <div style={{ padding: '0px' }}>
@@ -72,17 +89,25 @@ export function MainPage() {
 
       <h2 style={{ marginTop: '20px', paddingLeft: '10px' }}>热门商品</h2>
       <Row gutter={[16, 16]} style={{ margin: '10px' }}>
-        {hotProducts.map((product, index) => (
+        {currentProducts.map((product, index) => (
           <Col key={index} span={12}>
             <Card
               hoverable
-              cover={<img alt={product.name} src={product.image} />}
+              cover={<img alt={product.name} src={product.imageList[0]} />}
+              onClick={() => handleCardClick(product.id)}
             >
               <Card.Meta title={product.name} description={product.price + '￥'} />
             </Card>
           </Col>
         ))}
       </Row>
+      <Pagination
+        current={currentPage}
+        pageSize={pageSize}
+        total={hotProducts.length}
+        onChange={handlePageChange}
+        style={{ textAlign: 'center', marginTop: '20px', marginBottom:'40px' }}
+      />
     </div>
   );
 }

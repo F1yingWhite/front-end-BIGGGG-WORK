@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Form, Input, Button } from 'antd';
+import { v4 as uuidv4 } from 'uuid';
 
 export function CreateOrderPage() {
     const { id } = useParams();
@@ -17,7 +18,7 @@ export function CreateOrderPage() {
         const orders = JSON.parse(localStorage.getItem('orders')) || [];
         const newOrder = {
             ...values,
-            id: `order-${Date.now()}`,
+            id: uuidv4(),  // 使用 uuidv4() 生成唯一ID
             productId: product.id,
             productName: product.name,
             price: product.price,
@@ -27,7 +28,7 @@ export function CreateOrderPage() {
         };
         orders.push(newOrder);
         localStorage.setItem('orders', JSON.stringify(orders));
-        navigate(`/user/dashboard/payment/${newOrder.id}`);
+        navigate(`/user/dashboard/selectPaymentMethod/${newOrder.id}`);
     };
 
     if (!product) return <div>Loading...</div>;
@@ -43,6 +44,12 @@ export function CreateOrderPage() {
                     <Input value={`￥${product.price}`} disabled />
                 </Form.Item>
                 <Form.Item label="收货地址" name="address" rules={[{ required: true, message: '请输入收货地址' }]} style={styles.formItem}>
+                    <Input />
+                </Form.Item>
+                <Form.Item label="收货人姓名" name="receiverName" rules={[{ required: true, message: '请输入收货人姓名' }]} style={styles.formItem}>
+                    <Input />
+                </Form.Item>
+                <Form.Item label="收货人电话" name="receiverPhone" rules={[{ required: true, message: '请输入收货人电话' }]} style={styles.formItem}>
                     <Input />
                 </Form.Item>
                 <Form.Item label="备注" name="remark" style={styles.formItem}>
@@ -72,6 +79,9 @@ const styles = {
         marginBottom: '10px',
     },
     button: {
-        width: '100%',
+        width: '80%',
+        backgroundColor: '#ffa500',
+        borderColor: '#ffa500',
+        marginBottom: '10px',
     },
 };

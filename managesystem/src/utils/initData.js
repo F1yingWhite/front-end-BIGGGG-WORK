@@ -1,10 +1,56 @@
 import CryptoJS from "crypto-js";
 import { getFileBase64 } from "./img2base64";
+import { v4 as uuidv4 } from "uuid";
+import { IndexedDBStorage } from "./indexdb";
 
-async function initData() {
-  let users = JSON.parse(localStorage.getItem("user")) || [];
-  if (users.length === 0) {
-    localStorage.setItem("user", JSON.stringify([
+async function initLocalStorageItem(key, defaultValue) {
+  let item = JSON.parse(localStorage.getItem(key)) || [];
+  if (item.length === 0) {
+    localStorage.setItem(key, JSON.stringify(defaultValue));
+    item = defaultValue;
+  }
+  return item;
+}
+
+async function initProducts(productStorage) {
+  let products = await productStorage.getItem("products").then(product => product.value).catch(error => {
+    console.error("没找到" + error);
+    return [];
+  });
+
+  if (products.length === 0) {
+    const tags = ['手机数码', '电脑办公', '汽车用品', '家用电器'];
+    const fetchPromises = tags.map(tag =>
+      fetch(`${process.env.PUBLIC_URL}/data/${tag}.json`)
+        .then((response) => response.json())
+        .then(async (data) => {
+          for (let product of data) {
+            product.name = product.product_name;
+            product.id = uuidv4();
+            product.seller = "seller";
+            product.classification = tag;
+            product.price = parseFloat(product.product_price);
+            product.sales = parseInt(product.product_sales);
+            product.stock = parseInt(product.product_stock);
+            product.imageList = [];
+            for (let image of product.carousel_images) {
+              product.imageList.push(await getFileBase64(new Request(image).url));
+            }
+            products.push(product);
+          }
+        })
+    );
+    await Promise.all(fetchPromises)
+      .then(() => productStorage.setItem("products", products))
+      .catch((error) => console.error('Error fetching the data:', error));
+  }
+  return products;
+}
+
+
+export async function initData() {
+  try {
+    await initLocalStorageItem("user", [
       {
         username: 'admin',
         password: CryptoJS.SHA256('Admin123456').toString(),
@@ -23,13 +69,9 @@ async function initData() {
         email: "21301173@bjtu.edu.cn",
         privilege: "商家"
       }
-    ]));
-  }
+    ]);
 
-  // 设置权限列表
-  let privileges = JSON.parse(localStorage.getItem('privileges')) || [];
-  if (privileges.length === 0) {
-    privileges = [
+    await initLocalStorageItem('privileges', [
       {
         role: '管理员',
         desc: '拥有所有权限'
@@ -42,14 +84,9 @@ async function initData() {
         role: "商家",
         desc: "能够管理商城商品"
       }
-    ];
-    localStorage.setItem('privileges', JSON.stringify(privileges));
-  }
+    ]);
 
-  // 设置菜单列表
-  let menus = JSON.parse(localStorage.getItem('menus')) || [];
-  if (menus.length === 0) {
-    menus = [
+    await initLocalStorageItem('menus', [
       {
         title: '权限管理',
         parent: "",
@@ -111,53 +148,31 @@ async function initData() {
           '商家'
         ]
       }
-    ];
-    localStorage.setItem('menus', JSON.stringify(menus));
-  }
+    ]);
 
-  // 商品名称 商品图片 商品价格 库存 销量 图片 商品编号 所属店家
-  let products = JSON.parse(localStorage.getItem('products')) || [];
+    let productStorage = new IndexedDBStorage('MyDatabase', 'products');
+    await productStorage.init()
+    let products = await initProducts(productStorage);
 
-  if (products.length === 0) {
-    const product = {
-      name: "huawei mate 60 pro",
-      classification: "手机数码",
-      image: await getFileBase64(`${process.env.PUBLIC_URL}/assets/mate60.png`),
-      price: 8848,
-      stock: 1024,
-      sales: 233,
-      imageList: await Promise.all([
-        getFileBase64(`${process.env.PUBLIC_URL}/assets/mate60_3.png`),
-        getFileBase64(`${process.env.PUBLIC_URL}/assets/mate60_2.png`),
-        getFileBase64(`${process.env.PUBLIC_URL}/assets/mate60_1.png`),
-      ]),
-      id: "d40a13a6-6b58-4f08-b9e6-da2cbd20c3fc",
-      seller: "seller"
-    };
-    products.push(product);
-    localStorage.setItem('products', JSON.stringify(products));
-  }
-  //订单的格式：用户姓名，商品id，订单商品，订单地址，订单时间，订单数量，订单金额，订单状态（付款-发货-收获）
-  let orders = JSON.parse(localStorage.getItem('orders')) || [];
-  if (orders.length === 0) {
-    orders = [
+    await initLocalStorageItem('orders', [
       {
+        id: uuidv4(),
         userId: "user",
         sellerId: "seller",
         productId: products[0].id,
         productName: products[0].name,
         address: "北京市海淀区",
+        receiverName: "张三",
+        receiverPhone: "13800000000",
+        remark: "请尽快发货",
         time: new Date().toLocaleString(),
         amount: 1,
         price: 8848,
         status: "付款"
       }
-    ];
-    localStorage.setItem('orders', JSON.stringify(orders));
-  }
-  let classificiations = JSON.parse(localStorage.getItem('classifications')) || [];
-  if (classificiations.length === 0) {
-    classificiations = [
+    ]);
+
+    await initLocalStorageItem('classifications', [
       {
         name: "手机数码",
       },
@@ -173,9 +188,9 @@ async function initData() {
       {
         name: "电脑办公",
       }
-    ];
-    localStorage.setItem('classifications', JSON.stringify(classificiations));
+    ]);
+  } catch (error) {
+    console.error('Error initializing data:', error);
+    throw error;
   }
 }
-
-export { initData };

@@ -1,4 +1,4 @@
-import { createBrowserRouter, Outlet, Navigate } from "react-router-dom";
+import { Navigate, createBrowserRouter, Outlet } from "react-router-dom";
 import userRouters from "./userRouters";
 import manageRouters from "./manageRouters";
 
@@ -15,8 +15,8 @@ const router = createBrowserRouter([
     children: userRouters
   },
   {
-    // path: "*",
-    // element: <Navigate to="/manage" />
+    path: "*",
+    element: <Navigate to="/manage" />
   }
 
 ]);

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Table, Input, Button, Modal, Form, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { isAuthorize } from '../../utils/authorize';
+import { IndexedDBStorage } from '../../utils/indexdb';
 
 export function ClassificationControl() {
   const [classifications, setClassifications] = useState(JSON.parse(localStorage.getItem("classifications")) || []);
@@ -10,8 +11,18 @@ export function ClassificationControl() {
   const [editingClassification, setEditingClassification] = useState(null);
   const [form] = Form.useForm();
   const navigate = useNavigate();
+  const [storage, setStorage] = useState(null);
+  const [storageInitialized, setStorageInitialized] = useState(false);
 
   useEffect(() => {
+    const initStorage = async () => {
+      const storage = new IndexedDBStorage('MyDatabase', 'products');
+      await storage.init();
+      setStorage(storage);
+      setStorageInitialized(true);
+    };
+    initStorage();
+
     if (!isAuthorize('分类列表')) {
       navigate('/manage/dashboard');
     }
@@ -35,23 +46,22 @@ export function ClassificationControl() {
     form.setFieldsValue(classification);
   };
 
-  const deleteClassification = (name) => {
+  const deleteClassification = async (name) => {
     const updatedClassifications = classifications.filter(classification => classification.name !== name);
     setClassifications(updatedClassifications);
     setFilteredClassifications(updatedClassifications);
     localStorage.setItem("classifications", JSON.stringify(updatedClassifications));
-
-    // Update products to remove deleted classification
-    const products = JSON.parse(localStorage.getItem('products')) || [];
+    const products = await storage.getItem('products').then(product => product.value);
     const updatedProducts = products.map(product => ({
       ...product,
       classification: product.classification === name ? '' : product.classification
     }));
-    localStorage.setItem('products', JSON.stringify(updatedProducts));
+    await storage.setItem('products', updatedProducts);
   };
 
-  const handleOk = () => {
-    form.validateFields().then(values => {
+  const handleOk = async () => {
+    try {
+      const values = await form.validateFields();
       const duplicate = classifications.some(classification => classification.name === values.name);
       if (duplicate && (!editingClassification || editingClassification.name !== values.name)) {
         message.error('分类名称不能重复', 3);
@@ -72,20 +82,19 @@ export function ClassificationControl() {
       setFilteredClassifications(updatedClassifications);
       localStorage.setItem("classifications", JSON.stringify(updatedClassifications));
 
-      // Update products with new classification name
       if (oldName) {
-        const products = JSON.parse(localStorage.getItem('products')) || [];
+        const products = await storage.getItem('products').then(product => product.value);
         const updatedProducts = products.map(product => ({
           ...product,
           classification: product.classification === oldName ? values.name : product.classification
         }));
-        localStorage.setItem('products', JSON.stringify(updatedProducts));
+        await storage.setItem('products', updatedProducts);
       }
 
       setAddClassificationVisible(false);
-    }).catch(info => {
+    } catch (error) {
       message.error('请填写完整信息', 3);
-    });
+    }
   };
 
   const handleCancel = () => {

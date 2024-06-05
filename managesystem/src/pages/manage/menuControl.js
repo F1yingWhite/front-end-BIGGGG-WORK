@@ -101,6 +101,7 @@ export function MenuControl() {
 
       let updatedMenus;
       if (editingMenu) {
+        values.allowUser = editingMenu.allowUser;
         updatedMenus = menus.map(menu => menu.title === editingMenu.title ? values : menu);
       } else {
         if (values.parent !== '') {
