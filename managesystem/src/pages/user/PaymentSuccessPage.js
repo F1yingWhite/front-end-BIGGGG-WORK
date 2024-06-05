@@ -25,15 +25,19 @@ export function PaymentSuccessPage() {
 
 const styles = {
   container: {
-    padding: '10px',
+    padding: '20px',
     fontFamily: 'Arial, sans-serif',
+    textAlign: 'center',
   },
   title: {
-    fontSize: '24px',
-    marginBottom: '10px',
+    fontSize: '26px',
+    marginBottom: '20px',
+    color: '#333',
   },
   button: {
-    width: '100%',
+    width: '80%',
+    backgroundColor: '#ffa500',
+    borderColor: '#ffa500',
     marginBottom: '10px',
   },
 };
