@@ -28,7 +28,7 @@ export function CreateOrderPage() {
         };
         orders.push(newOrder);
         localStorage.setItem('orders', JSON.stringify(orders));
-        navigate(`/user/dashboard/payment/${newOrder.id}`);
+        navigate(`/user/dashboard/selectPaymentMethod/${newOrder.id}`);
     };
 
     if (!product) return <div>Loading...</div>;
@@ -44,6 +44,12 @@ export function CreateOrderPage() {
                     <Input value={`￥${product.price}`} disabled />
                 </Form.Item>
                 <Form.Item label="收货地址" name="address" rules={[{ required: true, message: '请输入收货地址' }]} style={styles.formItem}>
+                    <Input />
+                </Form.Item>
+                <Form.Item label="收货人姓名" name="receiverName" rules={[{ required: true, message: '请输入收货人姓名' }]} style={styles.formItem}>
+                    <Input />
+                </Form.Item>
+                <Form.Item label="收货人电话" name="receiverPhone" rules={[{ required: true, message: '请输入收货人电话' }]} style={styles.formItem}>
                     <Input />
                 </Form.Item>
                 <Form.Item label="备注" name="remark" style={styles.formItem}>

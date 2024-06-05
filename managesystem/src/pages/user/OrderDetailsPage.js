@@ -26,6 +26,8 @@ export function OrderDetailsPage() {
       <p style={styles.detail}>价格: ￥{order.price}</p>
       <p style={styles.detail}>数量: {order.amount}</p>
       <p style={styles.detail}>收货地址: {order.address}</p>
+      <p style={styles.detail}>收货人姓名: {order.receiverName}</p>
+      <p style={styles.detail}>收货人电话: {order.receiverPhone}</p>
       <p style={styles.detail}>备注: {order.remark}</p>
       <p style={styles.detail}>订单状态: {order.status}</p>
       <p style={styles.detail}>订单时间: {order.time}</p>
