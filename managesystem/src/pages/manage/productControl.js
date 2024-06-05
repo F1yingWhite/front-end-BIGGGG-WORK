@@ -121,7 +121,7 @@ export function ProductControl() {
       setProducts(updatedProducts);
       setFilteredProducts(updatedProducts);
       setSearchValue('');
-      await storage.setItem('products', JSON.stringify(updatedProducts));
+      await storage.setItem('products', updatedProducts);
       setAddProductVisible(false);
       form.resetFields();
     } catch (error) {

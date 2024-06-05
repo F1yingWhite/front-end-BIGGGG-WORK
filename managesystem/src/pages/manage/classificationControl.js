@@ -51,13 +51,11 @@ export function ClassificationControl() {
     setClassifications(updatedClassifications);
     setFilteredClassifications(updatedClassifications);
     localStorage.setItem("classifications", JSON.stringify(updatedClassifications));
-    // Update products to remove deleted classification
     const products = await storage.getItem('products').then(product => product.value);
     const updatedProducts = products.map(product => ({
       ...product,
       classification: product.classification === name ? '' : product.classification
     }));
-    // Update IndexedDB
     await storage.setItem('products', updatedProducts);
   };
 
@@ -84,14 +82,12 @@ export function ClassificationControl() {
       setFilteredClassifications(updatedClassifications);
       localStorage.setItem("classifications", JSON.stringify(updatedClassifications));
 
-      // Update products with new classification name
       if (oldName) {
         const products = await storage.getItem('products').then(product => product.value);
         const updatedProducts = products.map(product => ({
           ...product,
           classification: product.classification === oldName ? values.name : product.classification
         }));
-        // Update IndexedDB
         await storage.setItem('products', updatedProducts);
       }
 
