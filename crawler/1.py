@@ -9,6 +9,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.edge.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.action_chains import ActionChains
 
 def login_jd(driver, username, password):
     login_url = 'https://passport.jd.com/uc/login'
@@ -64,11 +65,35 @@ def parse_product_details(url):
         product_shop = ""
 
     # 轮播图URL
+    # try:
+    #     carousel_images = tree.xpath('//*[@id="spec-list"]/ul/li/img/@src')
+    #     carousel_images = ["https:" + img for img in carousel_images]
+    # except:
+    #     carousel_images = []
+
+    # 获取详情图的URL
     try:
-        carousel_images = tree.xpath('//*[@id="spec-list"]/ul/li/img/@src')
-        carousel_images = ["https:" + img for img in carousel_images]
-    except:
-        carousel_images = []
+        thumbnail_images_urls = []  # 存储缩略图的URL列表
+        while True:
+            thumbnail_images = driver.find_elements(By.CSS_SELECTOR, '#spec-list img')
+            for image in thumbnail_images:
+                ActionChains(driver).move_to_element(image).perform()
+                time.sleep(2)  # 等待详情图加载
+                detail_image_url = driver.find_element(By.CSS_SELECTOR, '#spec-img').get_attribute('src')  # 获取详情图的src链接
+                thumbnail_images_urls.append(detail_image_url)  # 将详情图的URL添加到列表中
+                print("Detail Image URL:", detail_image_url)
+            
+            # 点击下一张按钮
+            next_button = driver.find_element(By.CSS_SELECTOR, 'a.arrow-next:not(.disabled)')
+            if 'disabled' in next_button.get_attribute('class'):
+                print("No more images available.")
+                break
+            else:
+                next_button.click()
+                time.sleep(2)  # 等待加载新的图片
+
+    except Exception as e:
+        print("Error getting detail image URL:", e)
 
     product_data = {
         "product_name": product_name,
@@ -77,7 +102,8 @@ def parse_product_details(url):
         "product_sales": f"{random.randint(1, 100000)}",
         "product_shop": product_shop,
         "product_stock": f"{random.randint(1, 100000)}",
-        "carousel_images": carousel_images
+        # "carousel_images": carousel_images,
+        "thumbnail_images":thumbnail_images_urls
     }
 
     return product_data
@@ -177,9 +203,10 @@ if __name__ == "__main__":
     categories = {
         # "电脑": ["显示器", "轻薄本", "台式机", "游戏本", "平板电脑"],
         # "电脑": ["游戏本", "平板电脑"],
-        "办公": ["游戏电竞", "高效办公", "智慧学习", "全屋智能", "户外休闲"],
+        # "办公": ["游戏电竞", "高效办公", "智慧学习", "全屋智能", "户外休闲"],
+        # "办公": ["全屋智能", "户外休闲"],
+        # "数码": ["手机配件", "影音娱乐", "外设产品", "摄影摄像", "智能设备"],
         "手机": ["手机"],
-        "数码": ["手机配件", "影音娱乐", "外设产品", "摄影摄像", "智能设备"],
         "家用电器": ["家用电器"],
         "家居": ["家居"],
         "家装": ["家装"],
@@ -187,11 +214,13 @@ if __name__ == "__main__":
     }
 
     options = Options()
-    # options.headless = True  # Uncomment if you want to run headless
     driver = webdriver.Edge(options=options)
 
     # 登录京东
     login_jd(driver, '1726634055@qq.com', 'GJyg6841!')
+
+    # 启用无头模式
+    options.headless = True
 
     for category, sub_categories in categories.items():
         for sub_category in sub_categories:
