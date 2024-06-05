@@ -13,7 +13,7 @@ import { AlipayPaymentPage } from "../pages/user/AIipay/AlipayPaymentPage";
 import { AlipayConfirmPage } from "../pages/user/AIipay/AlipayConfirmPage";
 import { AlipaySuccessPage } from "../pages/user/AIipay/AlipaySuccessPage";
 import { BankCardPaymentPage } from "../pages/user/BankCardPaymentPage";
-import { WeChatPaymentPage } from "../pages/user/WeChatPaymentPage";
+import { WeChatPaymentPage } from "../pages/user/AIipay/WeChatPaymentPage";
 import { PaymentConfirmPage } from "../pages/user/PaymentConfirmPage";
 import { PaymentSuccessPage } from "../pages/user/PaymentSuccessPage";
 import { OrderDetailsPage } from "../pages/user/OrderDetailsPage";
