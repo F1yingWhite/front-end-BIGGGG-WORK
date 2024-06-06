@@ -1,9 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Button, List, InputNumber, Row, Col } from 'antd';
+import { Card, Button, List, InputNumber, Row, Col, Modal, Form, Input } from 'antd';
+import { v4 as uuidv4 } from 'uuid';
+import { useNavigate } from 'react-router-dom';
 
 const ShoppingCart = () => {
   const [cart, setCart] = useState([]);
   const [allCart, setAllCart] = useState([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [form] = Form.useForm();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const storedCart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
@@ -47,8 +52,52 @@ const ShoppingCart = () => {
   const totalAmount = cart.reduce((total, item) => total + item.price * item.amount, 0);
 
   const handleJiesuan = () => {
-    // 处理结算逻辑
-  }
+    setIsModalVisible(true);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleFinish = (values) => {
+    const orders = localStorage.getItem('orders') ? JSON.parse(localStorage.getItem('orders')) : [];
+    let navOrderId = ""
+    // 每个商品创建一个订单
+    for (let i = 0; i < cart.length; i++) {
+      const product = cart[i];
+      const newOrder = {
+        ...values,
+        userId: localStorage.getItem('username'),
+        id: uuidv4(),
+        productId: product.productId,
+        productName: product.productName,
+        price: product.price,
+        status: "付款",
+        time: new Date().toLocaleString(),
+        amount: product.amount,
+      };
+      orders.push(newOrder);
+      navOrderId = newOrder.id
+    }
+    localStorage.setItem('orders', JSON.stringify(orders));
+    navigate(`/user/dashboard/selectPaymentMethod/${navOrderId}`);
+    setIsModalVisible(false);
+    clearCart();
+    // const newOrder = {
+    //   ...values,
+    //   userId: localStorage.getItem('username'),
+    //   id: uuidv4(),
+    //   items: cart,
+    //   price: totalAmount,
+    //   status: "付款",
+    //   time: new Date().toLocaleString(),
+    // };
+    // orders.push(newOrder);
+    // localStorage.setItem('orders', JSON.stringify(orders));
+    // navigate(`/user/dashboard/selectPaymentMethod/${newOrder.id}`);
+    // setIsModalVisible(false);
+    // clearCart();
+  };
 
   return (
     <Card title="购物车" style={{ width: '100%', maxWidth: 600, margin: 'auto' }}>
@@ -92,6 +141,32 @@ const ShoppingCart = () => {
           <Button type="primary" onClick={handleJiesuan}>去结算</Button>
         </Col>
       </Row>
+
+      <Modal
+        title="填写订单信息"
+        visible={isModalVisible}
+        onCancel={handleCancel}
+        footer={null}
+      >
+        <Form form={form} onFinish={handleFinish}>
+          <Form.Item label="收货地址" name="address" rules={[{ required: true, message: '请输入收货地址' }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item label="收货人姓名" name="receiverName" rules={[{ required: true, message: '请输入收货人姓名' }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item label="收货人电话" name="receiverPhone" rules={[{ required: true, message: '请输入收货人电话' }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item label="备注" name="remark">
+            <Input.TextArea />
+          </Form.Item>
+          <Form.Item>
+            <Button type="default" onClick={handleCancel} style={{ marginRight: 8 }}>返回</Button>
+            <Button type="primary" htmlType="submit">提交订单</Button>
+          </Form.Item>
+        </Form>
+      </Modal>
     </Card>
   );
 };

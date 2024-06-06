@@ -44,6 +44,36 @@ export function CreateOrderPage() {
     navigate(`/user/dashboard/selectPaymentMethod/${newOrder.id}`);
   };
 
+  // const handleFinish = async (values) => {
+  //   const orders = localStorage.getItem('orders') ? JSON.parse(localStorage.getItem('orders')) : [];
+  //   const username = localStorage.getItem('username');
+
+  //   const items = [{ 
+  //     id: uuidv4(),
+  //     productName: product.name,
+  //     productId: product.id,
+  //     price: product.price,
+  //     amount: 1,
+  //     img: product.imageList[0],
+  //     maxNumber: product.stock,
+  //     username,
+  //   }];
+
+  //   const newOrder = {
+  //     ...values,
+  //     userId: username,
+  //     id: uuidv4(),
+  //     items,
+  //     price: product.price,
+  //     status: "付款",
+  //     time: new Date().toLocaleString(),
+  //   };
+
+  //   orders.push(newOrder);
+  //   localStorage.setItem('orders', JSON.stringify(orders));
+  //   navigate(`/user/dashboard/selectPaymentMethod/${newOrder.id}`);
+  // };
+
   if (!product) return <div>Loading...</div>;
 
   return (

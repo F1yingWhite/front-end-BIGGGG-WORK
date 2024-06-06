@@ -190,16 +190,16 @@ export async function initData() {
     ]);
 
     await initLocalStorageItem('shoppingCart', [
-      {
-        id: uuidv4(),
-        username: 'admin',
-        productId: products[0].id,
-        maxNumber: products[0].stock,
-        productName: products[0].name,
-        amount: 1,
-        price: products[0].price,
-        img: products[0].imageList[0]
-      }
+      // {
+      //   id: uuidv4(),
+      //   username: 'admin',
+      //   productId: products[0].id,
+      //   maxNumber: products[0].stock,
+      //   productName: products[0].name,
+      //   amount: 1,
+      //   price: products[0].price,
+      //   img: products[0].imageList[0]
+      // }
     ]
 
     );

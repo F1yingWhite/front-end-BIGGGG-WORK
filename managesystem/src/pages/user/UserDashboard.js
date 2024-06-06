@@ -21,9 +21,9 @@ const menuItems = [
 export function UserDashboard() {
   const navigate = useNavigate();
   const location = useLocation();
-  let nowKey = location.pathname.split('/')
 
-  const [selectedKey, setSelectedKey] = useState(nowKey[nowKey.length - 1]);
+  const nowKey = location.pathname.split('/').pop();
+  const [selectedKey, setSelectedKey] = useState(nowKey);
 
   const handleMenuClick = ({ key }) => {
     if (key !== selectedKey) {
@@ -39,6 +39,8 @@ export function UserDashboard() {
   }, [navigate]);
 
   useEffect(() => {
+    const key = location.pathname.split('/').pop();
+    setSelectedKey(key);
     if (location.pathname === '/user/dashboard') {
       navigate('/user/dashboard/home');
       setSelectedKey('home');
