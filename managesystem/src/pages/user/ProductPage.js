@@ -115,6 +115,7 @@ const styles = {
   },
   productImage: {
     width: '100%',
-    marginBottom: '10px',
+    marginBottom: '0px',
+    marginTop: '-7px',
   },
 };
