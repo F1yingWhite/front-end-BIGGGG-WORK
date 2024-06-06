@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Button, Image, Row, Col, Carousel } from 'antd';
+import { Button, Image, Row, Col, Carousel, message } from 'antd';
 import { ProductContext } from '../../App';
+import { v4 as uuidv4 } from "uuid";
 
 export function ProductPage() {
   const { id } = useParams();
@@ -30,6 +31,28 @@ export function ProductPage() {
     navigate(`/user/dashboard/createOrder/${id}`);
   };
 
+  const handleAddCart = () => {
+    const cart = localStorage.getItem('shoppingCart') ? JSON.parse(localStorage.getItem('shoppingCart')) : [];
+    const username = localStorage.getItem('username');
+    const existingItem = cart.find(item => item.productId === id && item.username === username);
+    if (existingItem) {
+      existingItem.amount += 1;
+    } else {
+      const newCartItem = {
+        id: uuidv4(),
+        productName: product.name,
+        productId: product.id,
+        price: product.price,
+        amount: 1,
+        img: product.imageList[0],
+        username,
+      };
+      cart.push(newCartItem);
+    }
+    localStorage.setItem('shoppingCart', JSON.stringify(cart));
+    message.success('成功加入购物车');
+  }
+
   if (!product) return <div>Loading...</div>;
 
   return (
@@ -52,7 +75,7 @@ export function ProductPage() {
           <Button type="primary" onClick={handleBuyNow} style={styles.buyButton}>
             立即购买
           </Button>
-          <Button style={styles.cartButton}>加入购物车</Button>
+          <Button style={styles.cartButton} onClick={handleAddCart}>加入购物车</Button>
         </Col>
       </Row>
       <div style={styles.imagesContainer}>
@@ -116,6 +139,6 @@ const styles = {
   productImage: {
     width: '100%',
     marginBottom: '0px',
-    marginTop: '-7px',
+    marginTop: '-6px',
   },
 };

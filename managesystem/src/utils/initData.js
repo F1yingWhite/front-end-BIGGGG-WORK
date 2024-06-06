@@ -188,8 +188,24 @@ export async function initData() {
         name: "电脑办公",
       }
     ]);
+
+    await initLocalStorageItem('shoppingCart', [
+      {
+        id: uuidv4(),
+        username: 'admin',
+        productId: products[0].id,
+        productName: products[0].name,
+        amount: 1,
+        price: products[0].price,
+        img: products[0].imageList[0]
+      }
+    ]
+
+    );
   } catch (error) {
     console.error('Error initializing data:', error);
     throw error;
   }
+
+
 }
