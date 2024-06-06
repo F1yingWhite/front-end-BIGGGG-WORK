@@ -45,6 +45,7 @@ export function ProductPage() {
         price: product.price,
         amount: 1,
         img: product.imageList[0],
+        maxNumber: product.stock,
         username,
       };
       cart.push(newCartItem);

@@ -18,7 +18,8 @@ const ShoppingCart = () => {
   const updateQuantity = (id, amount) => {
     const updatedCart = allCart.map(item => {
       if (item.id === id) {
-        return { ...item, amount };
+        const newAmount = amount > item.maxNumber ? item.maxNumber : amount;
+        return { ...item, amount: newAmount };
       }
       return item;
     });
@@ -45,6 +46,10 @@ const ShoppingCart = () => {
 
   const totalAmount = cart.reduce((total, item) => total + item.price * item.amount, 0);
 
+  const handleJiesuan = () => {
+    // 处理结算逻辑
+  }
+
   return (
     <Card title="购物车" style={{ width: '100%', maxWidth: 600, margin: 'auto' }}>
       <List
@@ -55,6 +60,7 @@ const ShoppingCart = () => {
             actions={[
               <InputNumber
                 min={1}
+                max={item.maxNumber}
                 value={item.amount}
                 onChange={value => updateQuantity(item.id, value)}
               />,
@@ -83,7 +89,7 @@ const ShoppingCart = () => {
           <span style={{ fontSize: 16 }}>总计: ¥{totalAmount}</span>
         </Col>
         <Col>
-          <Button type="primary">去结算</Button>
+          <Button type="primary" onClick={handleJiesuan}>去结算</Button>
         </Col>
       </Row>
     </Card>

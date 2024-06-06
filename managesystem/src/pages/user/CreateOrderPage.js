@@ -17,7 +17,7 @@ export function CreateOrderPage() {
         const selectedProduct = storedProducts.find((product) => product.id === id);
         setProduct(selectedProduct);
       } catch (error) {
-        console.log('Failed to fetch products from IndexedDB', error);
+        console.log( error);
       }
     };
 
