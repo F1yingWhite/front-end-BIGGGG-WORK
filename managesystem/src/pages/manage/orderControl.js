@@ -16,47 +16,47 @@ export function OrderControl() {
 
   const columns = [
     {
-      title: 'User ID',
-      dataIndex: 'userId',
-      key: 'userId',
-    },
-    {
-      title: 'Product ID',
+      title: '商品ID',
       dataIndex: 'productId',
       key: 'productId',
     },
     {
-      title: 'Product Name',
+      title: '商品名',
       dataIndex: 'productName',
       key: 'productName',
     },
     {
-      title: 'Address',
+      title: '用户名',
+      dataIndex: 'userId',
+      key: 'userId',
+    },
+    {
+      title: '地址',
       dataIndex: 'address',
       key: 'address',
     },
     {
-      title: 'Time',
+      title: '购买时间',
       dataIndex: 'time',
       key: 'time',
     },
     {
-      title: 'Amount',
+      title: '数量',
       dataIndex: 'amount',
       key: 'amount',
     },
     {
-      title: 'Price',
+      title: '价格',
       dataIndex: 'price',
       key: 'price',
     },
     {
-      title: 'Status',
+      title: '状态',
       dataIndex: 'status',
       key: 'status',
     },
     {
-      title: 'Actions',
+      title: '操作',
       key: 'actions',
       render: (text, record) => (
         <span>
