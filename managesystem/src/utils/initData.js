@@ -145,7 +145,6 @@ export async function initData() {
         path: "/classControl",
         allowUser: [
           '管理员',
-          '商家'
         ]
       }
     ]);

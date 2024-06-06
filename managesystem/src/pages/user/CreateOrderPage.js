@@ -31,7 +31,7 @@ export function CreateOrderPage() {
     const newOrder = {
       ...values,
       userId: localStorage.getItem('username'),
-      id: uuidv4(),  // 使用 uuidv4() 生成唯一ID
+      id: uuidv4(), 
       productId: product.id,
       productName: product.name,
       price: product.price,
