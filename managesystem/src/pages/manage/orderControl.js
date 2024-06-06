@@ -75,11 +75,6 @@ export function OrderControl() {
     setFilteredOrders(filtered);
   }, [currentUser, orders, navigate, userPrivilege]);
 
-  // const addOrder = () => {
-  //   setEditingOrder(null);
-  //   setAddOrderVisible(true);
-  //   form.resetFields();
-  // };
 
   const editOrder = (order) => {
     setEditingOrder(order);
@@ -93,7 +88,9 @@ export function OrderControl() {
       if (values.sellerId === undefined) {
         values.sellerId = currentUser;
       }
-      updatedOrders = orders.map(order => order.id === editingOrder.id ? values : order);
+      updatedOrders = orders.map(order =>
+        order.id === editingOrder.id ? { ...order, ...values } : order
+      );
       setOrders(updatedOrders);
       setFilteredOrders(userPrivilege === '管理员' ? updatedOrders : updatedOrders.filter(order => order.sellerId === currentUser));
       localStorage.setItem('orders', JSON.stringify(updatedOrders));
