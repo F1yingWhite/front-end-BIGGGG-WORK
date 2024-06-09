@@ -139,6 +139,7 @@ export function RoleControl() {
     });
     localStorage.setItem("menus", JSON.stringify(updatedMenus));
     setPrivilegeVisible(false);
+    window.location.reload();
   };
 
   const handlePrivilegeCancel = () => {

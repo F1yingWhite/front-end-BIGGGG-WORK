@@ -85,6 +85,7 @@ export function MenuControl() {
     setMenus(updatedMenus);
     setFilteredMenus(updatedMenus);
     localStorage.setItem('menus', JSON.stringify(updatedMenus));
+    window.location.reload();
   };
 
 
@@ -171,7 +172,6 @@ export function MenuControl() {
           </Form.Item>
         </Form>
       </Modal>
-
     </div >
   );
 }
