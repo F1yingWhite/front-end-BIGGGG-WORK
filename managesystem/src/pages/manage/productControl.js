@@ -99,6 +99,10 @@ export function ProductControl() {
       const imageList = await Promise.all(
         fileList.map(async (file) => file.url || await getBase64(file.originFileObj))
       );
+      if (imageList.length === 0) {
+        message.error('请上传图片', 3);
+        return;
+      }
 
       let updatedProducts;
       if (editingProduct) {
