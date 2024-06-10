@@ -61,7 +61,7 @@ export function ProductPage() {
       <Row gutter={[16, 16]}>
         <Col span={24}>
           <Carousel autoplay>
-            {product.carousel_images.map((img, index) => (
+            {product.imageList.map((img, index) => (
               <div key={index} style={styles.carouselImageContainer}>
                 <Image src={img} alt={`${product.name} ${index + 1}`} style={styles.carouselImage} />
               </div>

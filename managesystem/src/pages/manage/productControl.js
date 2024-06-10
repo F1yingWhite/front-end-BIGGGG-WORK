@@ -106,7 +106,7 @@ export function ProductControl() {
           product.id === editingProduct.id ? { ...product, ...values, imageList: imageList } : product
         );
       } else {
-        const newProduct = { ...values, id: uuidv4(), imageList: imageList, seller: privilege === '管理员' ? values.seller : username };
+        const newProduct = { ...values, id: uuidv4(), imageList: imageList, seller: privilege === '管理员' ? values.seller : username, productName: values.name };
         updatedProducts = [...products, newProduct];
       }
 
