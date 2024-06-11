@@ -155,6 +155,7 @@ export async function initData() {
 
     await initLocalStorageItem('orders', [
       {
+        img: products[0].imageList[0],
         id: uuidv4(),
         userId: "user",
         sellerId: "seller",
