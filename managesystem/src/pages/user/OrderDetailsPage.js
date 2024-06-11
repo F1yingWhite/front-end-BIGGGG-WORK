@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Button } from 'antd';
+import { Button, Card } from 'antd';
 
 export function OrderDetailsPage() {
   const { id } = useParams();
@@ -17,40 +17,63 @@ export function OrderDetailsPage() {
     navigate('/user/dashboard/home');
   };
 
-  if (!order) return <div>Loading...</div>;
+  if (!order) return <div style={styles.loading}>加载中...</div>;
 
   return (
     <div style={styles.container}>
-      <h1 style={styles.title}>订单详情</h1>
-      <p style={styles.detail}>商品名称: {order.productName}</p>
-      <p style={styles.detail}>价格: ￥{order.price}</p>
-      <p style={styles.detail}>数量: {order.amount}</p>
-      <p style={styles.detail}>收货地址: {order.address}</p>
-      <p style={styles.detail}>收货人姓名: {order.receiverName}</p>
-      <p style={styles.detail}>收货人电话: {order.receiverPhone}</p>
-      <p style={styles.detail}>备注: {order.remark}</p>
-      <p style={styles.detail}>订单状态: {order.status}</p>
-      <p style={styles.detail}>订单时间: {order.time}</p>
-      <Button type="primary" onClick={handleBackHome} style={styles.button}>返回首页</Button>
+      <Card style={styles.card}>
+        <h1 style={styles.title}>订单详情</h1>
+        <p style={styles.detail}><strong>商品名称:</strong> {order.productName}</p>
+        <p style={styles.detail}><strong>价格:</strong> ￥{order.price}</p>
+        <p style={styles.detail}><strong>数量:</strong> {order.amount}</p>
+        <p style={styles.detail}><strong>收货地址:</strong> {order.address}</p>
+        <p style={styles.detail}><strong>收货人姓名:</strong> {order.receiverName}</p>
+        <p style={styles.detail}><strong>收货人电话:</strong> {order.receiverPhone}</p>
+        <p style={styles.detail}><strong>备注:</strong> {order.remark}</p>
+        <p style={styles.detail}><strong>订单状态:</strong> {order.status}</p>
+        <p style={styles.detail}><strong>订单时间:</strong> {order.time}</p>
+        <Button type="primary" onClick={handleBackHome} style={styles.button}>返回首页</Button>
+      </Card>
     </div>
   );
 }
 
 const styles = {
   container: {
-    padding: '10px',
-    fontFamily: 'Arial, sans-serif',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: '100vh',
+    backgroundColor: '#f0f2f5',
+    padding: '20px',
+  },
+  card: {
+    width: '100%',
+    maxWidth: '600px',
+    padding: '20px',
+    borderRadius: '10px',
+    boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
   },
   title: {
     fontSize: '24px',
-    marginBottom: '10px',
+    marginBottom: '20px',
+    color: '#1890ff',
   },
   detail: {
-    fontSize: '18px',
+    fontSize: '16px',
     marginBottom: '10px',
   },
   button: {
     width: '100%',
     marginTop: '20px',
   },
+  loading: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100vh',
+    fontSize: '20px',
+  },
 };
+
+export default OrderDetailsPage;

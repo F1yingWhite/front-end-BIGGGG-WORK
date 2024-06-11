@@ -24,6 +24,7 @@ const styles = {
   container: {
     padding: '10px',
     fontFamily: 'Arial, sans-serif',
+    textAlign: 'center', // 添加此行以居中对齐内容
   },
   title: {
     fontSize: '24px',
@@ -33,11 +34,15 @@ const styles = {
     fontSize: '18px',
     marginBottom: '20px',
   },
-  // 红色颜色
-
+  image: {
+    display: 'block',
+    margin: '0 auto', // 添加此行以居中图片
+    maxWidth: '100%', // 确保图片适应容器
+  },
   button: {
     width: '100%',
     backgroundColor: 'red',
   },
-
 };
+
+export default BankCardPaymentPage;
