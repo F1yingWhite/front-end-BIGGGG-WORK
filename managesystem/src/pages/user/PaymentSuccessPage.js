@@ -17,7 +17,7 @@ export function PaymentSuccessPage() {
   return (
     <div style={styles.container}>
       <h1 style={styles.title}>支付成功</h1>
-      <Button type="primary" onClick={handleViewOrder} style={styles.button}>查看订单</Button>
+      <Button type="primary" onClick={handleViewOrder} style={{ ...styles.button, marginBottom: '10px' }}>查看订单</Button>
       <Button onClick={handleBackHome} style={styles.button}>返回首页</Button>
     </div>
   );
@@ -28,16 +28,22 @@ const styles = {
     padding: '20px',
     fontFamily: 'Arial, sans-serif',
     textAlign: 'center',
+    backgroundColor: '#f9f9f9',
+    minHeight: '100vh',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
   },
   title: {
     fontSize: '26px',
     marginBottom: '20px',
-    color: '#333',
+    color: 'rgb(204, 85, 61)',
   },
   button: {
     width: '80%',
-    backgroundColor: '#ffa500',
-    borderColor: '#ffa500',
-    marginBottom: '10px',
+    backgroundColor: 'rgb(204, 85, 61)',
+    borderColor: 'rgb(204, 85, 61)',
+    color: '#fff',
+    margin: '0 auto',
   },
 };

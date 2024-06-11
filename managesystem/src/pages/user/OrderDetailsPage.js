@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Button, Card } from 'antd';
+import { Button, Card, Row, Col, Image } from 'antd';
 
 export function OrderDetailsPage() {
   const { id } = useParams();
@@ -23,9 +23,16 @@ export function OrderDetailsPage() {
     <div style={styles.container}>
       <Card style={styles.card}>
         <h1 style={styles.title}>订单详情</h1>
-        <p style={styles.detail}><strong>商品名称:</strong> {order.productName}</p>
-        <p style={styles.detail}><strong>价格:</strong> ￥{order.price}</p>
-        <p style={styles.detail}><strong>数量:</strong> {order.amount}</p>
+        <Row gutter={[16, 16]}>
+          <Col span={8}>
+            <Image src={order.img} alt={order.productName} style={styles.productImage} />
+          </Col>
+          <Col span={16}>
+            <p style={styles.detail}><strong>商品名称:</strong> {order.productName}</p>
+            <p style={styles.detail}><strong>价格:</strong> ￥{order.price}</p>
+            <p style={styles.detail}><strong>数量:</strong> {order.amount}</p>
+          </Col>
+        </Row>
         <p style={styles.detail}><strong>收货地址:</strong> {order.address}</p>
         <p style={styles.detail}><strong>收货人姓名:</strong> {order.receiverName}</p>
         <p style={styles.detail}><strong>收货人电话:</strong> {order.receiverPhone}</p>
@@ -57,7 +64,7 @@ const styles = {
   title: {
     fontSize: '24px',
     marginBottom: '20px',
-    color: '#1890ff',
+    color: 'rgb(204, 85, 61)',
   },
   detail: {
     fontSize: '16px',
@@ -66,6 +73,8 @@ const styles = {
   button: {
     width: '100%',
     marginTop: '20px',
+    backgroundColor: 'rgb(204, 85, 61)',
+    borderColor: 'rgb(204, 85, 61)',
   },
   loading: {
     display: 'flex',
@@ -73,6 +82,10 @@ const styles = {
     alignItems: 'center',
     height: '100vh',
     fontSize: '20px',
+  },
+  productImage: {
+    width: '100%',
+    height: 'auto',
   },
 };
 

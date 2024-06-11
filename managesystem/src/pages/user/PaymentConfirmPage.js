@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Button } from 'antd';
+import { Button, Card } from 'antd';
 
 export function PaymentConfirmPage() {
   const { id } = useParams();
@@ -12,23 +12,36 @@ export function PaymentConfirmPage() {
 
   return (
     <div style={styles.container}>
-      <h1 style={styles.title}>确认付款</h1>
-      <p style={styles.instruction}>请确认您的付款已完成：</p>
-      <Button type="primary" onClick={handlePaymentSuccess} style={styles.button}>确认</Button>
+      <Card style={styles.card}>
+        <h1 style={styles.title}>确认付款</h1>
+        <p style={styles.instruction}>请确认您的付款已完成：</p>
+        <Button type="primary" onClick={handlePaymentSuccess} style={styles.button}>确认</Button>
+      </Card>
     </div>
   );
 }
 
 const styles = {
   container: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: '100vh',
+    backgroundColor: '#f0f2f5',
     padding: '20px',
-    fontFamily: 'Arial, sans-serif',
+  },
+  card: {
+    width: '100%',
+    maxWidth: '400px',
+    padding: '20px',
+    borderRadius: '10px',
+    boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
     textAlign: 'center',
   },
   title: {
     fontSize: '26px',
     marginBottom: '20px',
-    color: '#333',
+    color: 'rgb(204, 85, 61)',
   },
   instruction: {
     fontSize: '18px',
@@ -37,7 +50,9 @@ const styles = {
   },
   button: {
     width: '80%',
-    backgroundColor: '#ffa500',
-    borderColor: '#ffa500',
+    backgroundColor: 'rgb(204, 85, 61)',
+    borderColor: 'rgb(204, 85, 61)',
   },
 };
+
+export default PaymentConfirmPage;
