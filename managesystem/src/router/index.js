@@ -18,7 +18,6 @@ const router = createBrowserRouter([
     path: "*",
     element: <Navigate to="/manage" />
   }
-
 ]);
 
 export default router;
